@@ -2,6 +2,52 @@
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
 
+
+
+import { ref } from "vue";
+
+const selectedType = ref();
+const groupedTypes = ref([
+    {
+        label: 'Coding',
+        code: 'co',
+        items: [
+            { label: 'Base64', value: 'Base64' },
+            { label: 'URL', value: 'URL' },
+            { label: 'ASCII', value: 'ASCII' },
+            { label: 'HTML', value: 'HTML' },
+            { label: 'Hex', value: 'Hex' },
+            { label: 'Dec', value: 'Dec' },
+            { label: 'Bin', value: 'Bin' }
+        ]
+    },
+    {
+        label: 'Hashing',
+        code: 'ha',
+        items: [
+            { label: 'MD', value: 'MD' },
+            { label: 'SHA', value: 'SHA' },
+            { label: 'LM', value: 'LM' },
+            { label: 'NT', value: 'NT' },
+            { label: 'CRC', value: 'CRC' },
+            { label: 'Bcrypt', value: 'Bcrypt' }, 
+            { label: 'Argon2', value: 'Argon2' }
+        ]
+    },
+    {
+        label: 'Encrypting',
+        code: 'en',
+        items: [
+            { label: 'AES', value: 'AES' },
+            { label: 'RC', value: 'RC' },
+            { label: 'RSA', value: 'RSA' },
+            { label: 'DES', value: 'DES' }
+        ]
+    }
+]);
+
+
+
 </script>
 
 <template>
@@ -15,11 +61,10 @@ import HelloWorld from './components/HelloWorld.vue'
 
         <div class="component">
 
-          <Dropdown v-model="selectedCity" :options="groupedCities" optionLabel="label" optionGroupLabel="label" optionGroupChildren="items" placeholder="Select" class="w-full md:w-14rem">
+          <Dropdown v-model="selectedType" :options="groupedTypes" optionLabel="label" optionGroupLabel="label" optionGroupChildren="items" placeholder="Select" class="w-full md:w-14rem">
 
             <template #optiongroup="slotProps">
                 <div class="flex align-items-center">
-                    <img :alt="slotProps.option.label" src="https://primefaces.org/cdn/primevue/images/flag/flag_placeholder.png" :class="`mr-2 flag flag-${slotProps.option.code.toLowerCase()}`" style="width: 18px" />
                     <div>{{ slotProps.option.label }}</div>
                 </div>
             </template>
@@ -63,11 +108,10 @@ import HelloWorld from './components/HelloWorld.vue'
 
         <div class="component">
 
-          <Dropdown v-model="selectedCity" :options="groupedCities" optionLabel="label" optionGroupLabel="label" optionGroupChildren="items" placeholder="Select" class="w-full md:w-14rem">
+          <Dropdown v-model="selectedType" :options="groupedTypes" optionLabel="label" optionGroupLabel="label" optionGroupChildren="items" placeholder="Select" class="w-full md:w-14rem">
 
             <template #optiongroup="slotProps">
                 <div class="flex align-items-center">
-                    <img :alt="slotProps.option.label" src="https://primefaces.org/cdn/primevue/images/flag/flag_placeholder.png" :class="`mr-2 flag flag-${slotProps.option.code.toLowerCase()}`" style="width: 18px" />
                     <div>{{ slotProps.option.label }}</div>
                 </div>
             </template>
