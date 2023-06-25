@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-
-
 
 import { ref } from "vue";
 
+
 const selectedType = ref();
+const selectedType2 = ref();
 const groupedTypes = ref([
     {
         label: 'Coding',
@@ -46,9 +45,23 @@ const groupedTypes = ref([
     }
 ]);
 
+const handleClick = (): void => {
 
+  if (selectedType2.value) {
+    const selectedOption = selectedType2.value?.value;
+    alert("Selected option:"+ selectedOption);
+  } else {
+    alert("No option selected.");
+  }
+
+};
 
 </script>
+
+
+
+
+
 
 <template>
   
@@ -94,7 +107,7 @@ const groupedTypes = ref([
 
         <div class="button-submit">
 
-          <Button label="Submit" />
+          <Button label="Submit" @click="handleClick"/>
 
         </div>
 
@@ -108,7 +121,7 @@ const groupedTypes = ref([
 
         <div class="component">
 
-          <Dropdown v-model="selectedType" :options="groupedTypes" optionLabel="label" optionGroupLabel="label" optionGroupChildren="items" placeholder="Select" class="w-full md:w-14rem">
+          <Dropdown v-model="selectedType2" :options="groupedTypes" optionLabel="label" optionGroupLabel="label" optionGroupChildren="items" placeholder="Select" class="w-full md:w-14rem">
 
             <template #optiongroup="slotProps">
                 <div class="flex align-items-center">
@@ -145,6 +158,9 @@ const groupedTypes = ref([
   
 
 </template>
+
+
+
 
 <style scoped>
 .button{
