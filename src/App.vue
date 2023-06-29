@@ -56,6 +56,14 @@ const handleClick = (): void => {
   }
 };
 
+function swapValue(): void {
+  const third = value.value;
+  value.value = value2.value;
+  value2.value = "";
+
+
+}
+
 </script>
 
 
@@ -106,7 +114,7 @@ const handleClick = (): void => {
 
       <div class="column">
 
-        <Button icon="pi pi-arrow-right-arrow-left" aria-label="Filter" />
+        <Button icon="pi pi-arrow-right-arrow-left" aria-label="Filter" @click="swapValue"/>
 
         <div class="button-submit">
 
