@@ -64,6 +64,30 @@ function swapValue(): void {
 
 }
 
+function copyValue(): void {
+  if (value.value) {
+    navigator.clipboard.writeText(value.value);
+    alert("Value copied to clipboard.");
+  } 
+  
+  else {
+    alert("No input text.");
+  }
+}
+
+function copyValue2(): void {
+  if (value2.value) {
+    navigator.clipboard.writeText(value2.value);
+    alert("Value copied to clipboard.");
+  } 
+
+  else 
+  {
+    alert("No input text.");
+  }
+}
+
+
 </script>
 
 
@@ -104,7 +128,7 @@ function swapValue(): void {
 
           <div class="button">
 
-            <Button icon="pi pi-copy" aria-label="Filter" />
+            <Button icon="pi pi-copy" aria-label="Filter" @click="copyValue"/>
 
           </div>
 
@@ -114,7 +138,7 @@ function swapValue(): void {
 
       <div class="column">
 
-        <Button icon="pi pi-arrow-right-arrow-left" aria-label="Filter" @click="swapValue"/>
+        <Button icon="pi pi-arrow-left" aria-label="Filter" @click="swapValue"/>
 
         <div class="button-submit">
 
@@ -154,7 +178,7 @@ function swapValue(): void {
 
           <div class="button">
 
-            <Button icon="pi pi-copy" aria-label="Filter" />
+            <Button icon="pi pi-copy" aria-label="Filter" @click="copyValue2"/>
 
           </div>
 
