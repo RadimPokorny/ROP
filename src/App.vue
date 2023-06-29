@@ -59,7 +59,7 @@ const handleClick = (): void => {
 function swapValue(): void {
   const third = value.value;
   value.value = value2.value;
-  value2.value = "";
+  value2.value = third;
 
 
 }
@@ -85,6 +85,13 @@ function copyValue2(): void {
   {
     alert("No input text.");
   }
+}
+
+function isBoldGroup(code: string): boolean {
+  if(code == 'ha' || code == 'en' || code == 'co'){
+    return true;
+  }
+  return false;
 }
 
 
@@ -113,9 +120,9 @@ function copyValue2(): void {
           <Dropdown v-model="selectedType" :options="groupedTypes" optionLabel="label" optionGroupLabel="label" optionGroupChildren="items" placeholder="Select" class="w-full md:w-14rem">
 
             <template #optiongroup="slotProps">
-                <div class="flex align-items-center">
-                    <div>{{ slotProps.option.label }}</div>
-                </div>
+              <div class="flex align-items-center">
+                  <div>{{ slotProps.option.label }}</div>
+              </div>
             </template>
 
           </Dropdown>
@@ -146,7 +153,7 @@ function copyValue2(): void {
 
         <div class="button-submit">
 
-          <Button label="Submit" @click="handleClick"/>
+          <Button icon="pi pi-arrow-right" @click="handleClick"/>
 
         </div>
 
@@ -163,9 +170,9 @@ function copyValue2(): void {
           <Dropdown v-model="selectedType2" :options="groupedTypes" optionLabel="label" optionGroupLabel="label" optionGroupChildren="items" placeholder="Select" class="w-full md:w-14rem">
 
             <template #optiongroup="slotProps">
-                <div class="flex align-items-center">
-                    <div>{{ slotProps.option.label }}</div>
-                </div>
+              <div class="flex align-items-center">
+                  <div>{{ slotProps.option.label }}</div>
+              </div>
             </template>
 
           </Dropdown>
