@@ -45,15 +45,15 @@ const groupedTypes = ref([
     }
 ]);
 
+const value = ref("");
+const value2 = ref("");
+
 const handleClick = (): void => {
-
-  if (selectedType2.value) {
-    const selectedOption = selectedType2.value?.value;
-    alert("Selected option:"+ selectedOption);
+  if (value.value) {
+    value2.value = value.value;
   } else {
-    alert("No option selected.");
+    alert("No input text.");
   }
-
 };
 
 </script>
@@ -89,7 +89,10 @@ const handleClick = (): void => {
       
         <div class="component">
 
-          <Textarea v-model="value" autoResize rows="5" cols="30" />
+          <span class="p-float-label">
+            <Textarea v-model="value" autoResize rows="5" cols="30" />
+            <label>Input</label>
+            </span>
 
           <div class="button">
 
@@ -136,7 +139,10 @@ const handleClick = (): void => {
       
         <div class="component">
 
-          <Textarea v-model="value" autoResize rows="5" cols="30" />
+          <span class="p-float-label">
+          <Textarea v-model="value2" autoResize rows="5" cols="30" />
+          <label>Output</label>
+          </span>
 
           <div class="button">
 
