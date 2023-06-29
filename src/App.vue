@@ -96,6 +96,10 @@ function copyValue2(): void {
 
 
 <template>
+
+  <header class="header">
+    <h1 class="title">Web interface for penetration testing</h1>
+  </header>
   
   <div class="content">
 
