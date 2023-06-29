@@ -9,7 +9,7 @@ import PrimeVue from 'primevue/config'
 import router from './router'
 
 //theme
-import "primevue/resources/themes/lara-light-indigo/theme.css"
+import "primevue/resources/themes/arya-green/theme.css"
     
 //core
 import "primevue/resources/primevue.min.css"
