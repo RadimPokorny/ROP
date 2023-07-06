@@ -8,7 +8,7 @@ The main purpose of this project will be the ability to put a text string in the
 
 1. Install or update to the newest version of vue.js:
 
-   ```npm init vue@latest```
+   ```npm install vue@latest```
 
 2. Open the project (best in Visual Studio Code). Then open the terminal and run this:
 
