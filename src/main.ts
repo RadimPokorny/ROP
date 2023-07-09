@@ -1,4 +1,4 @@
-import './assets/main.css'
+import './assets/main.scss'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
@@ -9,7 +9,7 @@ import PrimeVue from 'primevue/config'
 import router from './router'
 
 //theme
-import "primevue/resources/themes/arya-green/theme.css"
+import './assets/theme.css';
     
 //core
 import "primevue/resources/primevue.min.css"
