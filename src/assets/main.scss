@@ -1,0 +1,67 @@
+@import "./base.scss";
+
+$color_1: hsla(160, 100%, 37%, 1);
+$color_2: #333;
+$background-color_1: #f16736;
+$background-color_2: #f07f56;
+
+#app {
+	max-width: 1280px;
+	margin: 0 auto;
+	font-weight: normal;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.center {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: row;
+}
+a {
+	text-decoration: none;
+	color: $color_1;
+	transition: 0.4s;
+}
+.green {
+	text-decoration: none;
+	color: $color_1;
+	transition: 0.4s;
+}
+body {
+	display: flex;
+	place-items: center;
+}
+.header {
+	position: absolute;
+	background-color: $background-color_1;
+	padding: 20px;
+	text-align: center;
+	width: 100%;
+	height: 60px;
+	top: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.title {
+	font-size: 24px;
+	color: $color_2;
+}
+@media (hover: hover) {
+	a {
+		&:hover {
+			background-color: $background-color_2;
+		}
+	}
+}
+@media (min-width: 1024px) {
+	#app {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		grid-template-columns: 1fr 1fr;
+		padding: 0 2rem;
+	}
+}
