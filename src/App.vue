@@ -20,13 +20,6 @@ const groupedTypes = ref([
 ]);
 const value = ref("");
 const value2 = ref("");
-const handleClick = (): void => {
-  if (value.value) {
-    value2.value = value.value;
-  } else {
-    alert("No input text.");
-  }
-};
 function swapValue(): void {
   const third = value.value;
   value.value = value2.value;
@@ -55,12 +48,6 @@ function copyValue2(): void {
   } else {
     alert("No input text.");
   }
-}
-function isBoldGroup(code: string): boolean {
-  if(code == 'ha' || code == 'en' || code == 'co'){
-    return true;
-  }
-  return false;
 }
 function resetComps(): void {
   value.value =  "";
