@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import { ref } from "vue";
+
 const selectedType = ref();
 const selectedType2 = ref();
 const groupedTypes = ref([
@@ -18,45 +19,56 @@ const groupedTypes = ref([
         ]
     }
 ]);
+
 const value = ref("");
 const value2 = ref("");
+
 function swapValue(): void {
   const third = value.value;
   value.value = value2.value;
   value2.value = third;
 }
+
 const isCopied = ref(false);
 const isCopied2 = ref(false);
+
 function copyValue(): void {
   if (value.value) {
     navigator.clipboard.writeText(value.value);
-    isCopied.value = true; // Set the isCopied flag to true after successful copying
+    // Set the isCopied flag to true after successful copying
+    isCopied.value = true; 
     setTimeout(() => {
-      isCopied.value = false; // Reset the isCopied flag after 1 second
+      // Reset the isCopied flag after 1 second
+      isCopied.value = false; 
     }, 1000);
   } else {
     alert("No input text.");
   }
 }
+
 function copyValue2(): void {
   if (value2.value) {
     navigator.clipboard.writeText(value2.value);
-    isCopied2.value = true; // Set the isCopied flag to true after successful copying
+    // Set the isCopied flag to true after successful copying
+    isCopied2.value = true; 
     setTimeout(() => {
-      isCopied2.value = false; // Reset the isCopied flag after 1 second
+      // Reset the isCopied flag after 1 second
+      isCopied2.value = false; 
     }, 1000);
   } else {
     alert("No input text.");
   }
 }
+
 function resetComps(): void {
   value.value =  "";
   value2.value = "";
 }
 </script>
+
 <template>
   <header class="header">
-    <p class="title">Web interface for penetration testing</p>
+    <p class="title">Web user interface to support penetration testing</p>
   </header>
   <div class="content">
     <div class="center">
@@ -152,6 +164,7 @@ function resetComps(): void {
     </div>
   </div>
 </template>
+
 <style scoped lang="scss">  
 $color_1: white;
 $background-color_1: #f16736;
