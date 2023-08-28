@@ -85,6 +85,7 @@ function resetComps(): void {
       <div class="column1">
         <div class="dropdown-copy">
           <Dropdown 
+            class="dropdown"
             v-model="selectedType" 
             :options="groupedTypes" 
             filter 
@@ -92,7 +93,7 @@ function resetComps(): void {
             optionGroupLabel="label" 
             optionGroupChildren="items" 
             placeholder="Select" 
-            style="width: 200px;">
+            style="width: 250px;">
             <template #optiongroup="slotProps">
               <div class="flex align-items-center">
                   <div>{{ slotProps.option.label }}</div>
@@ -137,6 +138,7 @@ function resetComps(): void {
       <div class="column3">
         <div class="dropdown-copy">
           <Dropdown 
+            class="dropdown"
             v-model="selectedType2" 
             :options="groupedTypes" 
             filter
@@ -144,7 +146,7 @@ function resetComps(): void {
             optionGroupLabel="label" 
             optionGroupChildren="items" 
             placeholder="Select" 
-            style="width: 200px;">
+            style="width: 250px;">
             <template #optiongroup="slotProps">
               <div class="flex align-items-center">
                   <div>{{ slotProps.option.label }}</div>
@@ -200,15 +202,13 @@ $background-color_1: #f16736;
 }
 
 .button {
-	margin: 20px;
+	margin-top: 20px;
+  margin-bottom: 20px;
 }
-.button-submit {
-	margin-top: 25px;
-}
+
 .content {
 	position: absolute !important;
 	display: flex;
-	justify-content: center;
 	align-items: center;
 	flex-direction: column;
   width: 100%;
@@ -238,7 +238,6 @@ $background-color_1: #f16736;
 	flex-direction: row;
 	width: auto;
 	height: auto;
-	margin: 10px;
 }
 .column {
 	position: relative;
@@ -246,8 +245,7 @@ $background-color_1: #f16736;
 	justify-content: center;
 	align-items: center;
 	flex-direction: column;
-	margin: 10px;
-  height: 100%;
+  height: 100%; 
 }
 .column1, .column3  {
   @extend .column;
@@ -255,21 +253,31 @@ $background-color_1: #f16736;
 }
 .column2  {
   @extend .column;
-  width: 10%;
+  width: 3.7rem;
+  margin-right: 20px;
+  margin-left: 20px;
 }
+
+.swap-btn{
+  margin-top: -70px;
+}
+
 Textarea {
   position: relative;
   width: 100%;
   height: 100%;
 }
 .reset-btn{
-  margin-top: 50px;
+  margin-top: 20px;
 }
-.swap-btn{
-  margin-top: 65px;
-}
-button{
+.p-button.p-button-icon-only {
   color: $color_1;
+  height: 3.7rem;
+  width: 3.7rem;
+  padding: .714rem;
+}
+.dropdown{
+  margin: 20px;
 }
 
 </style>
