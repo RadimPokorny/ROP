@@ -5,7 +5,14 @@ import { ref } from "vue";
 const selectedType = ref();
 const selectedType2 = ref();
 const groupedTypes = ref([
-    {
+      {
+        code: 'pt',
+        items:[
+          { label: 'Plain text', value: 'plain-text' }
+        ]
+      },
+
+      {
         label: 'Coding',
         code: 'co',
         items: [
@@ -19,6 +26,9 @@ const groupedTypes = ref([
         ]
     }
 ]);
+
+selectedType.value = groupedTypes.value[0].items.find(item => item.value === 'plain-text');
+selectedType2.value = groupedTypes.value[0].items.find(item => item.value === 'plain-text');
 
 const value = ref("");
 const value2 = ref("");
@@ -72,7 +82,7 @@ function resetComps(): void {
   </header>
   <div class="content">
     <div class="center">
-      <div class="column">
+      <div class="column1">
         <div class="dropdown-copy">
           <Dropdown 
             v-model="selectedType" 
@@ -102,28 +112,29 @@ function resetComps(): void {
             <Textarea 
               v-model="value" 
               autoResize 
-              rows="7" 
+              rows="30" 
               cols="50" 
             />
             <label>Input</label>
             </span>
         </div>
       </div>
-      <div class="column">
+      <div class="column2">
         <Button 
           icon="pi pi-arrow-right-arrow-left" 
           aria-label="Filter" 
           @click="swapValue"
           class="swap-btn"
+          disabled
         />
         <Button 
           aria-label="Reset" 
-          label="Reset"
+          icon="pi pi-replay" 
           @click="resetComps"
           class="reset-btn"
         />
       </div>
-      <div class="column">
+      <div class="column3">
         <div class="dropdown-copy">
           <Dropdown 
             v-model="selectedType2" 
@@ -150,13 +161,13 @@ function resetComps(): void {
         </div>
         <div class="component">
           <span class="p-float-label">
-          <Textarea 
-            v-model="value2" 
-            autoResize 
-            rows="7" 
-            cols="50" 
-            disabled 
-          />
+            <Textarea 
+              v-model="value2" 
+              autoResize 
+              rows="30" 
+              cols="50" 
+              disabled
+            />
           <label>Output</label>
           </span>
         </div>
@@ -166,8 +177,28 @@ function resetComps(): void {
 </template>
 
 <style scoped lang="scss">  
-$color_1: white;
+$color_1: white; 
 $background-color_1: #f16736;
+
+.header {
+	position: absolute;
+	background-color:$background-color_1;
+  color:$color_1;
+	padding: 20px; 
+	text-align: center;
+	width: 100%;
+	height: 60px;
+	top: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.title {
+	font-size: 24px;
+	color: $color_1;
+}
+
 .button {
 	margin: 20px;
 }
@@ -176,12 +207,12 @@ $background-color_1: #f16736;
 }
 .content {
 	position: absolute !important;
-	width: auto !important;
-	height: auto !important;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	flex-direction: column;
+  width: 100%;
+  height: 100%;
 }
 .container {
 	display: flex;
@@ -194,13 +225,11 @@ $background-color_1: #f16736;
 	border-radius: 20px;
 }
 .component {
-	display: flex;
-	justify-content: center;
+	
+  justify-content: center;
 	align-items: center;
-	flex-direction: column;
-	width: auto;
-	height: auto;
-	margin: 10px;
+  width: 100%;
+  height: 40%;
 }
 .dropdown-copy {
 	display: flex;
@@ -218,6 +247,20 @@ $background-color_1: #f16736;
 	align-items: center;
 	flex-direction: column;
 	margin: 10px;
+  height: 100%;
+}
+.column1, .column3  {
+  @extend .column;
+  width: 40%;
+}
+.column2  {
+  @extend .column;
+  width: 10%;
+}
+Textarea {
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 .reset-btn{
   margin-top: 50px;
@@ -225,4 +268,8 @@ $background-color_1: #f16736;
 .swap-btn{
   margin-top: 65px;
 }
+button{
+  color: $color_1;
+}
+
 </style>
