@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import { beforeAll } from 'vitest';
 
 const selectedType = ref();
 const selectedType2 = ref();
@@ -74,6 +75,9 @@ function resetComps(): void {
   value.value =  "";
   value2.value = "";
 }
+const isSwapButtonDisabled = computed(() => {
+  return value2.value === "";
+});
 </script>
 
 <template>
@@ -126,7 +130,7 @@ function resetComps(): void {
           aria-label="Filter" 
           @click="swapValue"
           class="swap-btn"
-          disabled
+          :disabled="isSwapButtonDisabled"
         />
         <Button 
           aria-label="Reset" 
