@@ -28,6 +28,8 @@ const groupedTypes = ref([
     }
 ]);
 
+
+//Setup the plain text as default value
 selectedType.value = groupedTypes.value[0].items.find(item => item.value === 'plain-text');
 selectedType2.value = groupedTypes.value[0].items.find(item => item.value === 'plain-text');
 
@@ -71,10 +73,47 @@ function copyValue2(): void {
   }
 }
 
+//Reset both textareas 
 function resetComps(): void {
   value.value =  "";
   value2.value = "";
 }
+
+function onChange() {
+  
+  let inputValue = (value.value).toString();
+  let plainText = "";
+
+  //Input switch - Converting a specific value to plain text
+  switch(selectedType.value.value) {
+    case 'Base64': {
+      plainText = atob(inputValue);
+      break;
+    }
+    default: {
+      plainText = inputValue;
+      break;
+    }
+  }
+  
+ let outputValue = "";
+
+  //Output switch - Converting a plain text from the first switch 
+  switch(selectedType2.value.value) {
+    case 'Base64': {
+      outputValue = btoa(plainText);
+      value2.value = outputValue;
+      
+      break;
+    }
+    default: {
+      value2.value = plainText;
+      break;
+    }
+  }
+
+}
+
 const isSwapButtonDisabled = computed(() => {
   return value2.value === "";
 });
@@ -128,7 +167,7 @@ const isSwapButtonDisabled = computed(() => {
         <Button 
           icon="pi pi-arrow-right-arrow-left" 
           aria-label="Filter" 
-          @click="swapValue"
+          @click="swapValue()"
           class="swap-btn"
           :disabled="isSwapButtonDisabled"
         />
@@ -146,6 +185,7 @@ const isSwapButtonDisabled = computed(() => {
             v-model="selectedType2" 
             :options="groupedTypes" 
             filter
+            @change="onChange()"
             optionLabel="label" 
             optionGroupLabel="label" 
             optionGroupChildren="items" 
