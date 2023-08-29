@@ -37,9 +37,15 @@ const value = ref("");
 const value2 = ref("");
 
 function swapValue(): void {
-  const third = value.value;
+  //Swap dropdown value
+  const tempType = selectedType.value;
+  selectedType.value = selectedType2.value;
+  selectedType2.value = tempType;
+
+  //Swap textarea value
+  const tempValue = value.value;
   value.value = value2.value;
-  value2.value = third;
+  value2.value = tempValue;
 }
 
 const isCopied = ref(false);
