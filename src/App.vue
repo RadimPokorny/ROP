@@ -83,6 +83,8 @@ function copyValue2(): void {
 function resetComps(): void {
   value.value =  "";
   value2.value = "";
+  selectedType.value = groupedTypes.value[0].items.find(item => item.value === 'plain-text');
+  selectedType2.value = groupedTypes.value[0].items.find(item => item.value === 'plain-text');
 }
 
 function onChange() {
