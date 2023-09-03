@@ -134,29 +134,31 @@ const isSwapButtonDisabled = computed(() => {
   <div class="content">
     <div class="center">
       <div class="column1">
-        <div class="dropdown-copy">
-          <Dropdown 
-            class="dropdown"
-            v-model="selectedType" 
-            :options="groupedTypes" 
-            filter 
-            optionLabel="label" 
-            optionGroupLabel="label" 
-            optionGroupChildren="items" 
-            placeholder="Select" 
-            style="width: 250px;">
-            <template #optiongroup="slotProps">
-              <div class="flex align-items-center">
-                  <div>{{ slotProps.option.label }}</div>
-              </div>
-            </template>
-          </Dropdown>
-          <div class="button">
-            <Button
-              :icon="isCopied ? 'pi pi-check' : 'pi pi-copy'"
-              aria-label="Filter"
-              @click="copyValue"
-            />
+        <div class="center-dropdown">
+          <div class="dropdown-copy">
+            <Dropdown 
+              class="dropdown"
+              v-model="selectedType" 
+              :options="groupedTypes" 
+              filter 
+              optionLabel="label" 
+              optionGroupLabel="label" 
+              optionGroupChildren="items" 
+              placeholder="Select" 
+              style="width: 250px;">
+              <template #optiongroup="slotProps">
+                <div class="flex align-items-center">
+                    <div>{{ slotProps.option.label }}</div>
+                </div>
+              </template>
+            </Dropdown>
+            <div class="button">
+              <Button
+                :icon="isCopied ? 'pi pi-check' : 'pi pi-copy'"
+                aria-label="Filter"
+                @click="copyValue"
+              />
+            </div>
           </div>
         </div>
         <div class="component">
@@ -172,19 +174,23 @@ const isSwapButtonDisabled = computed(() => {
         </div>
       </div>
       <div class="column2">
-        <Button 
+        <div class="dropdown-copy">
+        </div>
+        <div class="component">
+          <Button 
           icon="pi pi-arrow-right-arrow-left" 
           aria-label="Filter" 
           @click="swapValue()"
           class="swap-btn"
           :disabled="isSwapButtonDisabled"
-        />
-        <Button 
-          aria-label="Reset" 
-          icon="pi pi-replay" 
-          @click="resetComps"
-          class="reset-btn"
-        />
+          />
+          <Button 
+            aria-label="Reset" 
+            icon="pi pi-replay" 
+            @click="resetComps"
+            class="reset-btn"
+          />
+        </div>
       </div>
       <div class="column3">
         <div class="dropdown-copy">
@@ -266,6 +272,7 @@ $background-color_1: #f16736;
   width: 100%;
   height: 100%;
 }
+
 .container {
 	display: flex;
 	justify-content: center;
@@ -276,13 +283,23 @@ $background-color_1: #f16736;
 	height: 80px;
 	border-radius: 20px;
 }
+
 .component {
-	
   justify-content: center;
 	align-items: center;
   width: 100%;
   height: 40%;
 }
+
+.center-dropdown{
+  position: relative;
+  width: 100%;
+  height: auto !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .dropdown-copy {
 	display: flex;
 	justify-content: center;
@@ -290,7 +307,10 @@ $background-color_1: #f16736;
 	flex-direction: row;
 	width: auto;
 	height: auto;
+  //calculated margin for dropdown and copy button 
+  margin-left: -20px;
 }
+
 .column {
 	position: relative;
 	display: flex;
@@ -299,19 +319,22 @@ $background-color_1: #f16736;
 	flex-direction: column;
   height: 100%; 
 }
+
 .column1, .column3  {
   @extend .column;
   width: 40%;
 }
+
 .column2  {
   @extend .column;
   width: 3.7rem;
   margin-right: 20px;
   margin-left: 20px;
-}
 
-.swap-btn{
-  margin-top: -70px;
+  //Empty class used for responsivity
+  .dropdown-copy{
+    height: 99.2px;
+  }
 }
 
 Textarea {
@@ -322,14 +345,62 @@ Textarea {
 .reset-btn{
   margin-top: 20px;
 }
+
 .p-button.p-button-icon-only {
   color: $color_1;
   height: 3.7rem;
   width: 3.7rem;
   padding: .714rem;
 }
+
 .dropdown{
   margin: 20px;
 }
 
+@media only screen and (max-width: 798px) {
+  .center{
+    flex-direction: column;
+    height: auto !important;
+    margin-top: 60px;
+  }
+
+  .component{
+    height: auto !important;
+  }
+  .column2{
+    flex-direction: row;
+    width: 100%;
+    margin-top: 15px;   
+    .component{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  .column1, .column3{
+    width: 90%;
+  }
+
+  .reset-btn{
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-left: 10px;
+  }
+
+  .swap-btn{
+    margin-top: 0px;
+    margin-right: 10px; 
+  }
+
+}
+
+@media only screen and (max-width: 798px) {
+  .header{
+    height: 120px;
+  }
+  .content{
+    margin-top: 125px;
+  }
+}
 </style>
