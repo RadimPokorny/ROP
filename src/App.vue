@@ -87,6 +87,25 @@ function resetComps(): void {
   selectedType2.value = groupedTypes.value[0].items.find(item => item.value === 'plain-text');
 }
 
+// Function to convert hexadecimal to ASCII
+function hexToPlain(hexString: string) {
+  var hex = hexString.toString();
+  var str = '';
+  for (var i = 0; i < hex.length; i += 2) {
+    str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+  }
+  return str;
+}
+
+// Function to convert ASCII to hexadecimal
+function PlainToHex(asciiString: string) {
+  var hex = '';
+  for (var i = 0; i < asciiString.length; i++) {
+    hex += asciiString.charCodeAt(i).toString(16);
+  }
+  return hex;
+}
+
 function onChange() {
   
   let inputValue = (value.value).toString();
@@ -115,6 +134,10 @@ function onChange() {
     case 'HTML': {
       plainText = inputValue.replace("<p>", "");
       plainText = plainText.replace("</p>", "");
+      break;
+    }
+    case 'Hex': {
+      plainText = hexToPlain(inputValue);
       break;
     }
     default: {
@@ -149,6 +172,11 @@ function onChange() {
     }
     case 'HTML': {
       value2.value = "<p>" + plainText + "</p>";
+      break;
+    }
+    case 'Hex': {
+      outputValue = PlainToHex(plainText);
+      value2.value = outputValue;
       break;
     }
     default: {
