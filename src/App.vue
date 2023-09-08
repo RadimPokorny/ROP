@@ -493,12 +493,13 @@ Textarea {
     flex-direction: row;
     width: 100%;
     margin-top: 15px;   
-    .component{
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+    
+  .component{
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
+}
 
   .column1, .column3{
     width: 90%;
