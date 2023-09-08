@@ -106,6 +106,33 @@ function PlainToHex(asciiString: string) {
   return hex;
 }
 
+//Function to convert plain text to binary
+function PlainToBin(ptString: string){
+  
+   let bin = '';
+   bin = ptString.split('').map(char => {
+      return char.charCodeAt(0).toString(2);
+   }).join(' ');
+   return bin;
+}
+
+//Function to convert binary to plain text
+function BinToPlain(binaryString: string): string {
+  const Array = binaryString.split(' ');
+  let plainText = '';
+
+  for (let i = 0; i < Array.length; i++) {
+    const Char = Array[i];
+    const decimalValue = parseInt(Char, 2);
+
+    //Asking if the value is in 0 - 127 range
+    if (decimalValue >= 0 && decimalValue <= 127) {
+      plainText += String.fromCharCode(decimalValue);
+    }
+  }
+  return plainText;
+}
+
 function onChange() {
   
   let inputValue = (value.value).toString();
@@ -138,6 +165,10 @@ function onChange() {
     }
     case 'Hex': {
       plainText = hexToPlain(inputValue);
+      break;
+    }
+    case 'Bin': {
+      plainText = BinToPlain(inputValue);
       break;
     }
     default: {
@@ -176,6 +207,11 @@ function onChange() {
     }
     case 'Hex': {
       outputValue = PlainToHex(plainText);
+      value2.value = outputValue;
+      break;
+    }
+    case 'Bin': {
+      outputValue = PlainToBin(plainText);
       value2.value = outputValue;
       break;
     }
