@@ -167,6 +167,10 @@ function onChange() {
       plainText = hexToPlain(inputValue);
       break;
     }
+    case 'Dec': {
+      plainText = AsciiToPlain(inputValue);
+      break;
+    }
     case 'Bin': {
       plainText = BinToPlain(inputValue);
       break;
@@ -207,6 +211,11 @@ function onChange() {
     }
     case 'Hex': {
       outputValue = PlainToHex(plainText);
+      value2.value = outputValue;
+      break;
+    }
+    case 'Dec': {
+      outputValue = PlainToAscii(plainText);
       value2.value = outputValue;
       break;
     }
