@@ -87,7 +87,30 @@ function resetComps(): void {
   selectedType2.value = groupedTypes.value[0].items.find(item => item.value === 'plain-text');
 }
 
-// Function to convert hexadecimal to ASCII
+//Function to convert ASCII to plain text
+function AsciiToPlain(AsciiString: string) {
+  var array = AsciiString.split(' ');
+  var output = "";
+  for(let i = 0; i < array.length; i++){
+    var num = Number(array[i]);
+    const character = String.fromCharCode(num);
+    output += character;
+  }
+  return output;
+}
+
+//Function to convert plain text to ASCII
+function PlainToAscii(ptString: string) {
+  var output = "";
+  for(let i = 0; i < ptString.length; i++){
+    let code = ptString.charCodeAt(i);
+    output += code + " ";
+  }
+  output = output.slice(0,-1);
+  return output;
+}
+
+//Function to convert hexadecimal to plain text
 function hexToPlain(hexString: string) {
   var hex = hexString.toString();
   var str = '';
@@ -97,11 +120,11 @@ function hexToPlain(hexString: string) {
   return str;
 }
 
-// Function to convert ASCII to hexadecimal
-function PlainToHex(asciiString: string) {
+//Function to convert plain text to hexadecimal
+function PlainToHex(ptString: string) {
   var hex = '';
-  for (var i = 0; i < asciiString.length; i++) {
-    hex += asciiString.charCodeAt(i).toString(16);
+  for (var i = 0; i < ptString.length; i++) {
+    hex += ptString.charCodeAt(i).toString(16);
   }
   return hex;
 }
@@ -149,13 +172,7 @@ function onChange() {
       break;
     }
     case 'ASCII': {
-      //Splitting input so making ascii characters to char is much more faster
-      var array = inputValue.split(' ');
-      for(let i = 0; i < array.length; i++){
-        var num = Number(array[i]);
-        const character = String.fromCharCode(num);
-        plainText += character;
-      }
+      plainText = AsciiToPlain(inputValue);
       break;
     }
     case 'HTML': {
@@ -196,12 +213,7 @@ function onChange() {
       break;
     }
     case 'ASCII': {
-      //Using loop for. Adding specific characters to output value
-      for(let i = 0; i < plainText.length; i++){
-        let code = plainText.charCodeAt(i);
-        outputValue += code + " ";
-      }
-      outputValue = outputValue.slice(0,-1);
+      outputValue = PlainToAscii(plainText);
       value2.value = outputValue;
       break;
     }
