@@ -98,6 +98,10 @@ function onChange() {
       plainText = atob(inputValue);
       break;
     }
+    case 'URL': {
+      plainText = decodeURI(inputValue);
+      break;
+    }
     default: {
       plainText = inputValue;
       break;
@@ -111,7 +115,11 @@ function onChange() {
     case 'Base64': {
       outputValue = btoa(plainText);
       value2.value = outputValue;
-      
+      break;
+    }
+    case 'URL': {
+      outputValue = encodeURI(plainText);
+      value2.value = outputValue;
       break;
     }
     default: {
