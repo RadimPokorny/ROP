@@ -103,12 +103,18 @@ function onChange() {
       break;
     }
     case 'ASCII': {
+      //Splitting input so making ascii characters to char is much more faster
       var array = inputValue.split(' ');
       for(let i = 0; i < array.length; i++){
         var num = Number(array[i]);
         const character = String.fromCharCode(num);
         plainText += character;
       }
+      break;
+    }
+    case 'HTML': {
+      plainText = inputValue.replace("<p>", "");
+      plainText = plainText.replace("</p>", "");
       break;
     }
     default: {
@@ -132,12 +138,17 @@ function onChange() {
       break;
     }
     case 'ASCII': {
+      //Using loop for. Adding specific characters to output value
       for(let i = 0; i < plainText.length; i++){
         let code = plainText.charCodeAt(i);
         outputValue += code + " ";
       }
       outputValue = outputValue.slice(0,-1);
       value2.value = outputValue;
+      break;
+    }
+    case 'HTML': {
+      value2.value = "<p>" + plainText + "</p>";
       break;
     }
     default: {
