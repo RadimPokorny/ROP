@@ -102,6 +102,15 @@ function onChange() {
       plainText = decodeURI(inputValue);
       break;
     }
+    case 'ASCII': {
+      var array = inputValue.split(' ');
+      for(let i = 0; i < array.length; i++){
+        var num = Number(array[i]);
+        const character = String.fromCharCode(num);
+        plainText += character;
+      }
+      break;
+    }
     default: {
       plainText = inputValue;
       break;
@@ -119,6 +128,15 @@ function onChange() {
     }
     case 'URL': {
       outputValue = encodeURI(plainText);
+      value2.value = outputValue;
+      break;
+    }
+    case 'ASCII': {
+      for(let i = 0; i < plainText.length; i++){
+        let code = plainText.charCodeAt(i);
+        outputValue += code + " ";
+      }
+      outputValue = outputValue.slice(0,-1);
       value2.value = outputValue;
       break;
     }
