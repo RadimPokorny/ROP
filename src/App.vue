@@ -287,7 +287,6 @@ const isSwapButtonDisabled = computed(() => {
           <span class="p-float-label">
             <Textarea 
               v-model="value" 
-              autoResize 
               rows="30" 
               cols="50" 
             />
@@ -345,7 +344,6 @@ const isSwapButtonDisabled = computed(() => {
           <span class="p-float-label">
             <Textarea 
               v-model="value2" 
-              autoResize 
               rows="30" 
               cols="50" 
               disabled
@@ -486,6 +484,9 @@ Textarea {
     margin-top: 60px;
   }
 
+  .swap-btn{
+    transform: rotate(90deg); 
+  }
   .component{
     height: auto !important;
   }
