@@ -113,7 +113,7 @@ function PlainToAscii(ptString: string) {
 //Function to convert hexadecimal to plain text
 function hexToPlain(hexString: string) {
   var hex = hexString.toString();
-  var str = '';
+  var str = "";
   for (var i = 0; i < hex.length; i += 2) {
     str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
   }
@@ -131,12 +131,11 @@ function PlainToHex(ptString: string) {
 
 //Function to convert plain text to binary
 function PlainToBin(ptString: string){
-  
-   let bin = '';
-   bin = ptString.split('').map(char => {
-      return char.charCodeAt(0).toString(2);
-   }).join(' ');
-   return bin;
+  let bin = '';
+  bin = ptString.split('').map(char => {
+    return char.charCodeAt(0).toString(2);
+  }).join(' ');
+  return bin;
 }
 
 //Function to convert binary to plain text
@@ -287,7 +286,6 @@ const isSwapButtonDisabled = computed(() => {
           <span class="p-float-label">
             <Textarea 
               v-model="value" 
-              autoResize 
               rows="30" 
               cols="50" 
             />
@@ -345,7 +343,6 @@ const isSwapButtonDisabled = computed(() => {
           <span class="p-float-label">
             <Textarea 
               v-model="value2" 
-              autoResize 
               rows="30" 
               cols="50" 
               disabled
@@ -411,6 +408,10 @@ $background-color_1: #f16736;
 	align-items: center;
   width: 100%;
   height: 40%;
+}
+
+.p-inputtextarea:disabled{
+  opacity: 1;
 }
 
 .center-dropdown{
