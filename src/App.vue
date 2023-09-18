@@ -487,6 +487,9 @@ Textarea {
     margin-top: 60px;
   }
 
+  .swap-btn{
+    transform: rotate(90deg); 
+  }
   .component{
     height: auto !important;
   }
