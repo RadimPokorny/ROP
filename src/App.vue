@@ -87,6 +87,10 @@ function resetComps(): void {
   selectedType2.value = groupedTypes.value[0].items.find(item => item.value === 'plain-text');
 }
 
+function trimInput(): void {
+  value.value = value.value.trim();
+}
+
 //Function to convert ASCII to plain text
 function AsciiToPlain(AsciiString: string) {
   var array = AsciiString.split(' ');
@@ -310,6 +314,12 @@ const isSwapButtonDisabled = computed(() => {
             @click="resetComps"
             class="reset-btn"
           />
+          <Button 
+            aria-label="Trim" 
+            icon="pi pi-eraser" 
+            @click="trimInput"
+            class="trim-btn"
+          />
         </div>
       </div>
       <div class="column3">
@@ -469,6 +479,10 @@ Textarea {
   margin-top: 20px;
 }
 
+.trim-btn{
+  margin-top: 20px;
+}
+
 .p-button.p-button-icon-only {
   color: $color_1;
   height: 3.7rem;
@@ -513,6 +527,12 @@ Textarea {
     margin-top: 0px;
     margin-right: 0px;
     margin-left: 10px;
+  }
+
+  .trim-btn{
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-left: 20px;
   }
 
   .swap-btn{
