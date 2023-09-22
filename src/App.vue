@@ -181,8 +181,7 @@ function onChange() {
       break;
     }
     case 'HTML': {
-      plainText = inputValue.replace("<p>", "");
-      plainText = plainText.replace("</p>", "");
+      plainText = decode(inputValue);
       break;
     }
     case 'Hex': {
@@ -223,7 +222,8 @@ function onChange() {
       break;
     }
     case 'HTML': {
-      value2.value = "<p>" + plainText + "</p>";
+      outputValue = encode(inputValue);
+      value2.value = outputValue;
       break;
     }
     case 'Hex': {
