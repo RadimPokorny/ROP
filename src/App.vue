@@ -2,6 +2,8 @@
 import { RouterLink, RouterView } from 'vue-router'
 import { ref, computed } from "vue";
 import { beforeAll } from 'vitest';
+import {encode} from 'html-entities';
+import {decode} from 'html-entities';
 
 const selectedType = ref();
 const selectedType2 = ref();
