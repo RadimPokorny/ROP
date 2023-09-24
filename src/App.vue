@@ -32,8 +32,8 @@ const groupedTypes = ref([
 
 
 //Setup the plain text as default value
-selectedType.value = groupedTypes.value[0].items.find(item => item.value === 'plain-text');
-selectedType2.value = groupedTypes.value[0].items.find(item => item.value === 'plain-text');
+selectedType.value = groupedTypes.value[0].items[0];
+selectedType2.value = groupedTypes.value[0].items[0];
 
 const value = ref("");
 const value2 = ref("");
@@ -85,8 +85,8 @@ function copyValue2(): void {
 function resetComps(): void {
   value.value =  "";
   value2.value = "";
-  selectedType.value = groupedTypes.value[0].items.find(item => item.value === 'plain-text');
-  selectedType2.value = groupedTypes.value[0].items.find(item => item.value === 'plain-text');
+  selectedType.value = groupedTypes.value[0].items[0];
+  selectedType2.value = groupedTypes.value[0].items[0];
 }
 
 function trimInput(): void {
