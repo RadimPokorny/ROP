@@ -7,6 +7,7 @@ import {decode} from 'html-entities';
 import mdiVue from 'mdi-vue/v2'
 import * as mdijs from '@mdi/js'
 import { afterEach } from 'node:test';
+import { saveAs } from 'file-saver';
 
 
 const selectedType = ref();
@@ -82,6 +83,40 @@ function copyValue2(): void {
     }, 1000);
   } else {
     alert("No input text.");
+  }
+}
+
+function importInput(event) {
+  const fileInput = event.target;
+  const file = fileInput.files[0];
+  if (file) {
+    //Getting the file type
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+
+    //Alowed file types
+    const allowedExtensions = ['txt', 'text'];
+
+    //Checks if is allowed
+    if (allowedExtensions.includes(fileExtension)) {
+      const reader = new FileReader();
+      reader.onload = function () {
+        value.value = reader.result; 
+      };
+      reader.readAsText(file);
+    } else {
+      alert("Forbidden file type.");
+      fileInput.value = "";
+    }
+  }
+}
+
+
+function exportOutput() {
+  if (value2.value) {
+    const blob = new Blob([value2.value], { type: 'text/plain;charset=utf-8' });
+    saveAs(blob, 'output.txt'); // Change the filename as needed
+  } else {
+    alert("No output text to save.");
   }
 }
 
@@ -283,6 +318,8 @@ const isSwapButtonDisabled = computed(() => {
 </script>
 
 <template>
+  <!-- Hidden file input for importFile dialog -->
+  <input id="fileInput" type="file" style="display: none" @change="importInput" accept=".txt, .text"/>
   <header class="header">
     <p class="title">Web user interface to support penetration testing</p>
   </header>
@@ -313,6 +350,13 @@ const isSwapButtonDisabled = computed(() => {
                 :icon="isCopied ? 'pi pi-check' : 'pi pi-copy'"
                 aria-label="Filter"
                 @click="copyValue"
+              />
+            </div>
+            <div style="margin-left: 20px;" class="button">
+              <Button
+                icon="pi pi-file-import"
+                aria-label="Filter"
+                onclick="document.getElementById('fileInput').click()"
               />
             </div>
           </div>
@@ -382,6 +426,13 @@ const isSwapButtonDisabled = computed(() => {
               @click="copyValue2"
             />
           </div>
+          <div style="margin-left: 20px;" class="button">
+              <Button
+                icon="pi pi-file-export"
+                aria-label="Export"
+                @click="exportOutput"
+              />
+            </div>
         </div>
         <div class="component">
           <span class="p-float-label">
