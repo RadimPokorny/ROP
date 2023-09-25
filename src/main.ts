@@ -3,6 +3,9 @@ import './assets/main.scss'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
+import mdiVue from 'mdi-vue/v3'
+import * as mdijs from '@mdi/js'
+
 import App from './App.vue'
 import PrimeVue from 'primevue/config'
 
@@ -24,6 +27,10 @@ import Dropdown from 'primevue/dropdown'
 import Button from 'primevue/button';
 
 const app = createApp(App)
+
+app.use(mdiVue, {
+    icons: mdijs
+  }) 
 
 app.use(createPinia())
 app.use(router)

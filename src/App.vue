@@ -4,6 +4,9 @@ import { ref, computed } from "vue";
 import { beforeAll } from 'vitest';
 import {encode} from 'html-entities';
 import {decode} from 'html-entities';
+import mdiVue from 'mdi-vue/v2'
+import * as mdijs from '@mdi/js'
+
 
 const selectedType = ref();
 const selectedType2 = ref();
@@ -318,10 +321,12 @@ const isSwapButtonDisabled = computed(() => {
           />
           <Button 
             aria-label="Trim" 
-            icon="pi pi-eraser" 
             @click="trimInput"
             class="trim-btn"
-          />
+          >
+          <mdicon name="content-cut" />  
+          </Button>
+          
         </div>
       </div>
       <div class="column3">
@@ -483,6 +488,11 @@ Textarea {
 
 .trim-btn{
   margin-top: 20px;
+  width: 59.2px;
+  height: 59.2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .p-button.p-button-icon-only {
@@ -490,6 +500,7 @@ Textarea {
   height: 3.7rem;
   width: 3.7rem;
   padding: .714rem;
+  min-width: 3rem;
 }
 
 .dropdown{
