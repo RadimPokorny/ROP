@@ -6,6 +6,7 @@ import {encode} from 'html-entities';
 import {decode} from 'html-entities';
 import mdiVue from 'mdi-vue/v2'
 import * as mdijs from '@mdi/js'
+import { afterEach } from 'node:test';
 
 
 const selectedType = ref();
@@ -164,6 +165,19 @@ function BinToPlain(binaryString: string): string {
   return plainText;
 }
 
+function areaCheck() {
+
+  //Auto adding space between ASCII values
+  var lastChars = value.value.substring(value.value.length - 3, 3);
+  alert(lastChars);
+  if(selectedType.value.value = 'ASCII'){
+    var ifIncludes = lastChars.includes('');
+    if(ifIncludes == false){
+      value.value += " ";
+    }
+  }
+}
+
 function onChange() {
   
   let inputValue = (value.value).toString();
@@ -180,6 +194,17 @@ function onChange() {
       break;
     }
     case 'ASCII': {
+      
+      var controlArray = inputValue.split(' ');
+
+      for(var i =  0; i<controlArray.length;i++){
+        if(controlArray[i].length > 3){
+          alert('A space between ASCII values ​​is missing somewhere in the input');
+          value.value= "";  
+          return;
+        }
+      }
+
       plainText = AsciiToPlain(inputValue);
       break;
     }
@@ -267,6 +292,7 @@ const isSwapButtonDisabled = computed(() => {
         <div class="center-dropdown">
           <div class="dropdown-copy">
             <Dropdown 
+              @change="onChange()"
               class="dropdown"
               v-model="selectedType" 
               :options="groupedTypes" 
@@ -297,6 +323,7 @@ const isSwapButtonDisabled = computed(() => {
               v-model="value" 
               rows="30" 
               cols="50" 
+              @input ="areaCheck"
             />
             <label>Input</label>
             </span>
