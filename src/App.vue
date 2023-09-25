@@ -167,12 +167,10 @@ function BinToPlain(binaryString: string): string {
 
 function areaCheck() {
 
-  //Auto adding space between ASCII values
-  var lastChars = value.value.substring(value.value.length - 3, 3);
-  alert(lastChars);
-  if(selectedType.value.value = 'ASCII'){
-    var ifIncludes = lastChars.includes('');
-    if(ifIncludes == false){
+  //Automatically adding space between ASCII values
+  if(value.value.length >= 3){
+    var lastChars = value.value.substring(value.value.length - 3);
+    if(lastChars.includes(' ') == false){
       value.value += " ";
     }
   }
