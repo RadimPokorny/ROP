@@ -507,6 +507,11 @@ Textarea {
   margin: 20px;
 }
 
+.p-float-label input:focus ~ label, .p-float-label input.p-filled ~ label, .p-float-label textarea:focus ~ label, .p-float-label textarea.p-filled ~ label, .p-float-label .p-inputwrapper-focus ~ label, .p-float-label .p-inputwrapper-filled ~ label
+{
+  font-size: 16px;
+}
+
 @media only screen and (max-width: 798px) {
   .center{
     flex-direction: column;
