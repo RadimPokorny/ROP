@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterLink, RouterView } from 'vue-router';
 import { ref, computed } from "vue";
 import { beforeAll } from 'vitest';
 import {encode} from 'html-entities';
 import {decode} from 'html-entities';
-import mdiVue from 'mdi-vue/v2'
-import * as mdijs from '@mdi/js'
+import mdiVue from 'mdi-vue/v2';
+import * as mdijs from '@mdi/js';
 import { afterEach } from 'node:test';
 import { saveAs } from 'file-saver';
 
