@@ -27,8 +27,6 @@ import Dropdown from 'primevue/dropdown'
 
 import Button from 'primevue/button';
 
-import { saveAs } from 'file-saver';
-
 const app = createApp(App)
 
 app.use(mdiVue, {

@@ -92,10 +92,8 @@ function importInput(event) {
   if (file) {
     //Getting the file type
     const fileExtension = file.name.split('.').pop().toLowerCase();
-
     //Alowed file types
     const allowedExtensions = ['txt', 'text'];
-
     //Checks if is allowed
     if (allowedExtensions.includes(fileExtension)) {
       const reader = new FileReader();
@@ -319,7 +317,7 @@ const isSwapButtonDisabled = computed(() => {
 
 <template>
   <!-- Hidden file input for importFile dialog -->
-  <input id="fileInput" type="file" style="display: none" @change="importInput" accept=".txt, .text"/>
+  <input id="fileInput" type="file" style="display: none" @input="importInput" accept=".txt, .text"/>
   <header class="header">
     <p class="title">Web user interface to support penetration testing</p>
   </header>
