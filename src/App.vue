@@ -86,7 +86,7 @@ function copyValue2(): void {
   }
 }
 
-function importInput(event) {
+function importInput(event: any) {
   const fileInput = event.target;
   const file = fileInput.files[0];
   if (file) {
@@ -326,36 +326,40 @@ const isSwapButtonDisabled = computed(() => {
       <div class="column1">
         <div class="center-dropdown">
           <div class="dropdown-copy">
-            <Dropdown 
-              @change="onChange()"
-              class="dropdown"
-              v-model="selectedType" 
-              :options="groupedTypes" 
-              filter 
-              optionLabel="label" 
-              optionGroupLabel="label" 
-              optionGroupChildren="items" 
-              placeholder="Select" 
-              style="width: 250px;">
-              <template #optiongroup="slotProps">
-                <div class="flex align-items-center">
-                    <div>{{ slotProps.option.label }}</div>
-                </div>
-              </template>
-            </Dropdown>
-            <div class="button">
-              <Button
-                :icon="isCopied ? 'pi pi-check' : 'pi pi-copy'"
-                aria-label="Filter"
-                @click="copyValue"
-              />
+            <div class="dropdown-block">
+              <Dropdown 
+                @change="onChange()"
+                class="dropdown"
+                v-model="selectedType" 
+                :options="groupedTypes" 
+                filter 
+                optionLabel="label" 
+                optionGroupLabel="label" 
+                optionGroupChildren="items" 
+                placeholder="Select" 
+                style="width: 250px;">
+                <template #optiongroup="slotProps">
+                  <div class="flex align-items-center">
+                      <div>{{ slotProps.option.label }}</div>
+                  </div>
+                </template>
+              </Dropdown>
             </div>
-            <div style="margin-left: 20px;" class="button">
-              <Button
-                icon="pi pi-file-import"
-                aria-label="Filter"
-                onclick="document.getElementById('fileInput').click()"
-              />
+            <div class="button-block">
+              <div class="button">
+                <Button
+                  :icon="isCopied ? 'pi pi-check' : 'pi pi-copy'"
+                  aria-label="Filter"
+                  @click="copyValue"
+                />
+              </div>
+              <div style="margin-left: 20px;" class="button">
+                <Button
+                  icon="pi pi-file-import"
+                  aria-label="Filter"
+                  onclick="document.getElementById('fileInput').click()"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -373,6 +377,8 @@ const isSwapButtonDisabled = computed(() => {
       </div>
       <div class="column2">
         <div class="dropdown-copy">
+          <div class="dropdonw-block"></div>
+          <div class="button-block"></div>
         </div>
         <div class="component">
           <Button 
@@ -400,37 +406,41 @@ const isSwapButtonDisabled = computed(() => {
       </div>
       <div class="column3">
         <div class="dropdown-copy">
-          <Dropdown 
-            class="dropdown"
-            v-model="selectedType2" 
-            :options="groupedTypes" 
-            filter
-            @change="onChange()"
-            optionLabel="label" 
-            optionGroupLabel="label" 
-            optionGroupChildren="items" 
-            placeholder="Select" 
-            style="width: 250px;">
-            <template #optiongroup="slotProps">
-              <div class="flex align-items-center">
-                  <div>{{ slotProps.option.label }}</div>
-              </div>
-            </template>
-          </Dropdown>
-          <div class="button">
-            <Button
-              :icon="isCopied2 ? 'pi pi-check' : 'pi pi-copy'"
-              aria-label="Filter"
-              @click="copyValue2"
-            />
+          <div class="dropdown-block">
+            <Dropdown 
+              class="dropdown"
+              v-model="selectedType2" 
+              :options="groupedTypes" 
+              filter
+              @change="onChange()"
+              optionLabel="label" 
+              optionGroupLabel="label" 
+              optionGroupChildren="items" 
+              placeholder="Select" 
+              style="width: 250px;">
+              <template #optiongroup="slotProps">
+                <div class="flex align-items-center">
+                    <div>{{ slotProps.option.label }}</div>
+                </div>
+              </template>
+            </Dropdown>
           </div>
-          <div style="margin-left: 20px;" class="button">
+          <div class="button-block">
+            <div class="button">
+              <Button
+                :icon="isCopied2 ? 'pi pi-check' : 'pi pi-copy'"
+                aria-label="Filter"
+                @click="copyValue2"
+              />
+            </div>
+            <div style="margin-left: 20px;" class="button">
               <Button
                 icon="pi pi-file-export"
                 aria-label="Export"
                 @click="exportOutput"
               />
             </div>
+          </div>
         </div>
         <div class="component">
           <span class="p-float-label">
@@ -523,8 +533,13 @@ $background-color_1: #f16736;
 	flex-direction: row;
 	width: auto;
 	height: auto;
-  //calculated margin for dropdown and copy button 
-  margin-left: -20px;
+}
+
+.button-block{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
 }
 
 .column {
@@ -581,11 +596,46 @@ Textarea {
 
 .dropdown{
   margin: 20px;
+  margin-left: 0px;
 }
 
 .p-float-label input:focus ~ label, .p-float-label input.p-filled ~ label, .p-float-label textarea:focus ~ label, .p-float-label textarea.p-filled ~ label, .p-float-label .p-inputwrapper-focus ~ label, .p-float-label .p-inputwrapper-filled ~ label
 {
   font-size: 16px;
+}
+
+@media only screen and (max-width: 950px) {
+  .dropdown-copy{
+    flex-direction: column;
+    height: 178.78px !important;
+  }
+
+  .column1, .column3{
+    .button-block{
+      min-width: 295px;
+    }
+  }
+
+  .button{
+    margin-top: 0px;
+  }
+
+  .column1{
+    margin-left: 20px;
+  }
+
+  .column3{
+    margin-right: 20px;
+  }
+
+  .column1, .column3  {
+    @extend .column;
+    width: auto !important;
+  }
+
+  .dropdown{
+    margin-left: 20px;
+  }
 }
 
 @media only screen and (max-width: 798px) {
@@ -605,16 +655,18 @@ Textarea {
     flex-direction: row;
     width: 100%;
     margin-top: 15px;   
-    
-  .component{
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background-color: #1E1E1E;
+    .component{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
-}
 
   .column1, .column3{
     width: 90%;
+    margin-left: 20px;
+    margin-right: 20px;
   }
 
   .reset-btn{
@@ -634,6 +686,12 @@ Textarea {
     margin-right: 10px; 
   }
 
+  .column2{
+    .dropdown-copy{
+      flex-direction: column;
+      height: 99.2px !important;
+    }
+  }
 }
 
 @media only screen and (max-width: 798px) {
