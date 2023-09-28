@@ -10,6 +10,14 @@ The main purpose of this project will be the ability to put a text string in the
 
    ```npm install vue@latest```
 
+1. Now install these libraries which are used in the project:
+
+   ```npm install html-entities```
+   ```npm install --save mdi-vue @mdi/js```
+   ```npm install @types/file-saver --save-dev```
+   ```npm install vue-router@4```
+   ```npm install primevue```
+
 2. Open the project (best in Visual Studio Code). Then open the terminal and run this:
 
    ```npm run dev```
