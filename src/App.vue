@@ -203,10 +203,12 @@ function onChange() {
     //Input switch - Converting a specific value to plain text
     switch(selectedType.value.value) {
       case 'Base64': {
+        //Decoding to the character format with the JavaScript method
         plainText = atob(inputValue);
         break;
       }
       case 'URL': {
+        //Decoding to the character format with the JavaScript method
         plainText = decodeURI(inputValue);
         break;
       }
@@ -219,17 +221,18 @@ function onChange() {
             return;
           }
         }
+        //Decoding to the character format with a custom method
         plainText = AsciiToPlain(inputValue);
         break;
       }
       case 'HTML': {
+        //Decoding to the character format with the JavaScript external method
         plainText = decode(inputValue);
         break;
       }
       case 'Hex': {
-        if(plainText != ""){
-          plainText = parseInt(inputValue, 16).toString();
-        }
+        //Decoding to the number format
+        plainText = parseInt(inputValue, 16).toString();
         break;
       }
       case 'Dec': {
@@ -239,11 +242,11 @@ function onChange() {
       case 'Bin': {
         //Checks if the number is binary
         if (/^[01]+$/.test(inputValue)) {
-          //Convert to the number format
+          //Decoding to the number format
           if(selectedType2.value.value == 'Dec' || selectedType2.value.value == 'Hex'){
             plainText = parseInt( inputValue, 2 ).toString();
           }
-          //Convert to the character format
+          //Decoding to the character format
           else plainText = BinToPlain(inputValue);
         }
         else alert('Invalid binary value');
@@ -256,17 +259,18 @@ function onChange() {
     }
     
     let outputValue = "";
-    //Output switch - Converting a plain text from the first switch 
-    if(value.value == ''){
+    if(plainText == ''){
       alert('Input is empty');
     }
     else {
+      //Output switch - Converting a plain text converted from the first switch 
       switch(selectedType2.value.value) {
         case 'Base64': {
           if(selectedType.value.value == 'Dec'||selectedType.value.value =='Hex'){
             alert('Please use character decoding method instead of only numeric');
           }
           else{
+            //Encoding to the characters with the JavaScript method
             outputValue = btoa(plainText);
             value2.value = outputValue;
           }
@@ -277,6 +281,7 @@ function onChange() {
             alert('Please use character decoding method instead of only numeric');
           }
           else{
+          //Encoding to the characters with the JavaScript method
           outputValue = encodeURI(plainText);
           value2.value = outputValue;
           }
@@ -287,6 +292,7 @@ function onChange() {
             alert('Please use character decoding method instead of only numeric');
           }
           else{
+          //Encoding to the characters with a custom method
           outputValue = PlainToAscii(plainText);
           value2.value = outputValue;
           }
@@ -297,6 +303,7 @@ function onChange() {
             alert('Please use character decoding method instead of only numeric');
           }
           else{
+          //Encoding to the characters with the JavaScript external method
           outputValue = encode(inputValue);
           value2.value = outputValue;
           }
@@ -304,6 +311,7 @@ function onChange() {
         }
         case 'Hex': {
           if(selectedType.value.value == 'Dec'||selectedType.value.value =='Bin'){
+            //Encoding to the number with the JavaScript method
             outputValue = Number(plainText).toString(16);
             value2.value = outputValue;
           }
@@ -320,11 +328,11 @@ function onChange() {
           break;
         }
         case 'Bin': {
-          //Converts to the number
+          //Encoding to the number
           if(selectedType.value.value == 'Dec' || selectedType.value.value == 'Hex'){
             outputValue = Number(plainText).toString(2);
           }
-          //Converts to the characters
+          //Encoding to the characters with a custom method
           else outputValue = PlainToBin(plainText);
           value2.value = outputValue;
           break;
