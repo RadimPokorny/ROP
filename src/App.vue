@@ -153,25 +153,6 @@ function PlainToAscii(ptString: string) {
   return output;
 }
 
-//Function to convert hexadecimal to plain text
-function hexToPlain(hexString: string) {
-  var hex = hexString.toString();
-  var str = "";
-  for (var i = 0; i < hex.length; i += 2) {
-    str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
-  }
-  return str;
-}
-
-//Function to convert plain text to hexadecimal
-function PlainToHex(ptString: string) {
-  var hex = '';
-  for (var i = 0; i < ptString.length; i++) {
-    hex += ptString.charCodeAt(i).toString(16);
-  }
-  return hex;
-}
-
 //Function to convert plain text to binary
 function PlainToBin(ptString: string){
   let bin = '';
@@ -212,99 +193,150 @@ function areaCheck() {
 }
 
 function onChange() {
-  
   let inputValue = (value.value).toString();
   let plainText = "";
 
-  //Input switch - Converting a specific value to plain text
-  switch(selectedType.value.value) {
-    case 'Base64': {
-      plainText = atob(inputValue);
-      break;
+  if(selectedType.value.value == selectedType2.value.value){
+    alert('Same method in input and output')
+  }
+  else{
+    //Input switch - Converting a specific value to plain text
+    switch(selectedType.value.value) {
+      case 'Base64': {
+        plainText = atob(inputValue);
+        break;
+      }
+      case 'URL': {
+        plainText = decodeURI(inputValue);
+        break;
+      }
+      case 'ASCII': {
+        var controlArray = inputValue.split(' ');
+        for(var i =  0; i<controlArray.length;i++){
+          if(controlArray[i].length > 3){
+            alert('A space between ASCII values ​​is missing somewhere in the input');
+            value.value= "";  
+            return;
+          }
+        }
+        plainText = AsciiToPlain(inputValue);
+        break;
+      }
+      case 'HTML': {
+        plainText = decode(inputValue);
+        break;
+      }
+      case 'Hex': {
+        if(plainText != ""){
+          plainText = parseInt(inputValue, 16).toString();
+        }
+        break;
+      }
+      case 'Dec': {
+        plainText = inputValue;
+        break;
+      }
+      case 'Bin': {
+        //Checks if the number is binary
+        if (/^[01]+$/.test(inputValue)) {
+          //Convert to the number format
+          if(selectedType2.value.value == 'Dec' || selectedType2.value.value == 'Hex'){
+            plainText = parseInt( inputValue, 2 ).toString();
+          }
+          //Convert to the character format
+          else plainText = BinToPlain(inputValue);
+        }
+        else alert('Invalid binary value');
+        break;
+      }
+      default: {
+        plainText = inputValue;
+        break;
+      }
     }
-    case 'URL': {
-      plainText = decodeURI(inputValue);
-      break;
+    
+    let outputValue = "";
+    //Output switch - Converting a plain text from the first switch 
+    if(value.value == ''){
+      alert('Input is empty');
     }
-    case 'ASCII': {
-      
-      var controlArray = inputValue.split(' ');
-
-      for(var i =  0; i<controlArray.length;i++){
-        if(controlArray[i].length > 3){
-          alert('A space between ASCII values ​​is missing somewhere in the input');
-          value.value= "";  
-          return;
+    else {
+      switch(selectedType2.value.value) {
+        case 'Base64': {
+          if(selectedType.value.value == 'Dec'||selectedType.value.value =='Hex'){
+            alert('Please use character decoding method instead of only numeric');
+          }
+          else{
+            outputValue = btoa(plainText);
+            value2.value = outputValue;
+          }
+          break;
+        }
+        case 'URL': {
+          if(selectedType.value.value == 'Dec'||selectedType.value.value =='Hex'){
+            alert('Please use character decoding method instead of only numeric');
+          }
+          else{
+          outputValue = encodeURI(plainText);
+          value2.value = outputValue;
+          }
+          break;
+        }
+        case 'ASCII': {
+          if(selectedType.value.value == 'Dec'||selectedType.value.value =='Hex'){
+            alert('Please use character decoding method instead of only numeric');
+          }
+          else{
+          outputValue = PlainToAscii(plainText);
+          value2.value = outputValue;
+          }
+          break;
+        }
+        case 'HTML': {
+          if(selectedType.value.value == 'Dec'||selectedType.value.value =='Hex'){
+            alert('Please use character decoding method instead of only numeric');
+          }
+          else{
+          outputValue = encode(inputValue);
+          value2.value = outputValue;
+          }
+          break;
+        }
+        case 'Hex': {
+          if(selectedType.value.value == 'Dec'||selectedType.value.value =='Bin'){
+            outputValue = Number(plainText).toString(16);
+            value2.value = outputValue;
+          }
+          else alert('Please use Decimal or Binary format to encode to the Hexadecimal value');
+          break;
+        }
+        case 'Dec': {
+          if(selectedType.value.value == 'Bin' || selectedType.value.value == 'Hex'){
+            value2.value = plainText;
+          }
+          else {
+            alert('Please use Hexadecimal or Binary format to encode to the Decimal value');
+          }
+          break;
+        }
+        case 'Bin': {
+          //Converts to the number
+          if(selectedType.value.value == 'Dec' || selectedType.value.value == 'Hex'){
+            outputValue = Number(plainText).toString(2);
+          }
+          //Converts to the characters
+          else outputValue = PlainToBin(plainText);
+          value2.value = outputValue;
+          break;
+        }
+        default: {
+          if(selectedType.value.value == 'Hex' || selectedType.value.value == 'Dec'){
+            alert('Choose numeric encoding method please');
+          }
+          else value2.value = plainText;
+          break;
         }
       }
-
-      plainText = AsciiToPlain(inputValue);
-      break;
-    }
-    case 'HTML': {
-      plainText = decode(inputValue);
-      break;
-    }
-    case 'Hex': {
-      plainText = hexToPlain(inputValue);
-      break;
-    }
-    case 'Dec': {
-      plainText = AsciiToPlain(inputValue);
-      break;
-    }
-    case 'Bin': {
-      plainText = BinToPlain(inputValue);
-      break;
-    }
-    default: {
-      plainText = inputValue;
-      break;
-    }
-  }
-  
- let outputValue = "";
-
-  //Output switch - Converting a plain text from the first switch 
-  switch(selectedType2.value.value) {
-    case 'Base64': {
-      outputValue = btoa(plainText);
-      value2.value = outputValue;
-      break;
-    }
-    case 'URL': {
-      outputValue = encodeURI(plainText);
-      value2.value = outputValue;
-      break;
-    }
-    case 'ASCII': {
-      outputValue = PlainToAscii(plainText);
-      value2.value = outputValue;
-      break;
-    }
-    case 'HTML': {
-      outputValue = encode(inputValue);
-      value2.value = outputValue;
-      break;
-    }
-    case 'Hex': {
-      outputValue = PlainToHex(plainText);
-      value2.value = outputValue;
-      break;
-    }
-    case 'Dec': {
-      outputValue = PlainToAscii(plainText);
-      value2.value = outputValue;
-      break;
-    }
-    case 'Bin': {
-      outputValue = PlainToBin(plainText);
-      value2.value = outputValue;
-      break;
-    }
-    default: {
-      value2.value = plainText;
-      break;
     }
   }
 
