@@ -395,7 +395,7 @@ const isSwapButtonDisabled = computed(() => {
               </div>
               <div style="margin-left: 20px;" class="button">
                 <Button
-                  icon="pi pi-file-import"
+                  icon="pi pi-file-export"
                   aria-label="Filter"
                   onclick="document.getElementById('fileInput').click()"
                 />
@@ -475,7 +475,7 @@ const isSwapButtonDisabled = computed(() => {
             </div>
             <div style="margin-left: 20px;" class="button">
               <Button
-                icon="pi pi-file-export"
+                icon="pi pi-file-import"
                 aria-label="Export"
                 @click="exportOutput"
               />
