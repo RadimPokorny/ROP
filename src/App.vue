@@ -98,7 +98,7 @@ function importInput(event: any) {
     if (allowedExtensions.includes(fileExtension)) {
       const reader = new FileReader();
       reader.onload = function () {
-        value.value = reader.result; 
+        value.value = String(reader.result); 
       };
       reader.readAsText(file);
     } else {
