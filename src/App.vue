@@ -237,9 +237,10 @@ function onChange() {
         for(let i = 0; i<numberArray.length;++i){
 
           if(numberArray[i] != ""){
-            plainText += parseInt(numberArray[i], 16).toString();
+            plainText += parseInt(numberArray[i], 16).toString() + " ";
           }
         }
+        plainText = plainText.slice(0,-1);
         break;
       }
       case 'Dec': {
@@ -254,8 +255,8 @@ function onChange() {
           var convertErrorMessage = "";
 
           for(let i = 0; i<numberArray.length;++i){
-            if(/^[01]+$/.test(numberArray[i])){
-              plainText += parseInt(numberArray[i],2).toString() + " ";
+            if (/^[01]+$/.test(numberArray[i])) {
+              plainText += parseInt(numberArray[i], 2).toString() + " ";
             }
             else{
               convertErrorMessage += +numberArray[i]+" ";
@@ -268,7 +269,8 @@ function onChange() {
           }
           
           //Decoding to the character format
-          else plainText = BinToPlain(inputValue);
+          plainText = plainText.slice(0,-1);
+          plainText = BinToPlain(inputValue);
         }
         break;
       }
@@ -334,6 +336,7 @@ function onChange() {
               outputValue += Number(inputNumbers[i]).toString(16)+ " ";
             }
           }
+          outputValue = outputValue.slice(0,-1);
           value2.value = outputValue;
         }
         else alert('Please use Decimal or Binary format to encode to the Hexadecimal value');
@@ -355,9 +358,19 @@ function onChange() {
           
           for(let i = 0; i<inputNumbers.length;++i){
             if(inputNumbers[i] != ""){
-              outputValue += Number(inputNumbers[i]).toString(2)+ " ";
+              
+              let num = Number(inputNumbers[i]);
+              
+              if (num < 0) {
+                let binaryNum = num.toString(2);
+                outputValue += binaryNum + " ";
+              } 
+              else {
+                outputValue += num.toString(2) + " ";
+              }
             }
           }
+          outputValue = outputValue.slice(0,-1);
         }
         //Encoding to the characters with a custom method
         else outputValue = PlainToBin(plainText);
