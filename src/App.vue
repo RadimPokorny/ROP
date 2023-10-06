@@ -236,8 +236,9 @@ function onChange() {
 
         for(let i = 0; i<numberArray.length;++i){
 
-          plainText += parseInt(numberArray[i], 16).toString();
-
+          if(numberArray[i] != ""){
+            plainText += parseInt(numberArray[i], 16).toString();
+          }
         }
         break;
       }
@@ -329,7 +330,9 @@ function onChange() {
           var inputNumbers = plainText.split(' ');
           
           for(let i = 0; i<inputNumbers.length;++i){
-            outputValue += Number(inputNumbers[i]).toString(16)+ " ";
+            if(inputNumbers[i] != ""){
+              outputValue += Number(inputNumbers[i]).toString(16)+ " ";
+            }
           }
           value2.value = outputValue;
         }
@@ -351,7 +354,9 @@ function onChange() {
           var inputNumbers = plainText.split(' ');
           
           for(let i = 0; i<inputNumbers.length;++i){
-            outputValue += Number(inputNumbers[i]).toString(2)+ " ";
+            if(inputNumbers[i] != ""){
+              outputValue += Number(inputNumbers[i]).toString(2)+ " ";
+            }
           }
         }
         //Encoding to the characters with a custom method
