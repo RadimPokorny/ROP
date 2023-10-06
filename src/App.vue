@@ -232,7 +232,13 @@ function onChange() {
       }
       case 'Hex': {
         //Decoding to the number format
-        plainText = parseInt(inputValue, 16).toString();
+        var numberArray = value.value.split(' ');
+
+        for(let i = 0; i<numberArray.length;++i){
+
+          plainText += parseInt(numberArray[i], 16).toString();
+
+        }
         break;
       }
       case 'Dec': {
@@ -241,15 +247,28 @@ function onChange() {
       }
       case 'Bin': {
         //Checks if the number is binary
-        if (/^[01]+$/.test(inputValue)) {
-          //Decoding to the number format
-          if(selectedType2.value.value == 'Dec' || selectedType2.value.value == 'Hex'){
-            plainText = parseInt( inputValue, 2 ).toString();
+        //Decoding to the number format
+        if(selectedType2.value.value == 'Dec' || selectedType2.value.value == 'Hex'){
+           var numberArray = inputValue.split(' ');
+          var convertErrorMessage = "";
+
+          for(let i = 0; i<numberArray.length;++i){
+            if(/^[01]+$/.test(numberArray[i])){
+              plainText += parseInt(numberArray[i],2).toString() + " ";
+            }
+            else{
+              convertErrorMessage += +numberArray[i]+" ";
+              value.value = value.value.replace(numberArray[i], "");
+            }
           }
+          
+          if(convertErrorMessage != ""){
+            alert(convertErrorMessage + "cannot be converted.");
+          }
+          
           //Decoding to the character format
           else plainText = BinToPlain(inputValue);
         }
-        else alert('Invalid binary value');
         break;
       }
       default: {
@@ -259,91 +278,93 @@ function onChange() {
     }
     
     let outputValue = "";
-    if(plainText == ''){
-      alert('Input is empty');
-    }
-    else {
-      //Output switch - Converting a plain text converted from the first switch 
-      switch(selectedType2.value.value) {
-        case 'Base64': {
-          if(selectedType.value.value == 'Dec'||selectedType.value.value =='Hex'){
-            alert('Please use character decoding method instead of only numeric');
-          }
-          else{
-            //Encoding to the characters with the JavaScript method
-            outputValue = btoa(plainText);
-            value2.value = outputValue;
-          }
-          break;
+    //Output switch - Converting a plain text converted from the first switch 
+    switch(selectedType2.value.value) {
+      case 'Base64': {
+        if(selectedType.value.value == 'Dec'||selectedType.value.value =='Hex'){
+          alert('Please use character decoding method instead of only numeric');
         }
-        case 'URL': {
-          if(selectedType.value.value == 'Dec'||selectedType.value.value =='Hex'){
-            alert('Please use character decoding method instead of only numeric');
-          }
-          else{
+        else{
           //Encoding to the characters with the JavaScript method
-          outputValue = encodeURI(plainText);
+          outputValue = btoa(plainText);
           value2.value = outputValue;
-          }
-          break;
         }
-        case 'ASCII': {
-          if(selectedType.value.value == 'Dec'||selectedType.value.value =='Hex'){
-            alert('Please use character decoding method instead of only numeric');
+        break;
+      }
+      case 'URL': {
+        if(selectedType.value.value == 'Dec'||selectedType.value.value =='Hex'){
+          alert('Please use character decoding method instead of only numeric');
+        }
+        else{
+        //Encoding to the characters with the JavaScript method
+        outputValue = encodeURI(plainText);
+        value2.value = outputValue;
+        }
+        break;
+      }
+      case 'ASCII': {
+        if(selectedType.value.value == 'Dec'||selectedType.value.value =='Hex'){
+          alert('Please use character decoding method instead of only numeric');
+        }
+        else{
+        //Encoding to the characters with a custom method
+        outputValue = PlainToAscii(plainText);
+        value2.value = outputValue;
+        }
+        break;
+      }
+      case 'HTML': {
+        if(selectedType.value.value == 'Dec'||selectedType.value.value =='Hex'){
+          alert('Please use character decoding method instead of only numeric');
+        }
+        else{
+        //Encoding to the characters with the JavaScript external method
+        outputValue = encode(inputValue);
+        value2.value = outputValue;
+        }
+        break;
+      }
+      case 'Hex': {
+        if(selectedType.value.value == 'Dec'||selectedType.value.value =='Bin'){
+          var inputNumbers = plainText.split(' ');
+          
+          for(let i = 0; i<inputNumbers.length;++i){
+            outputValue += Number(inputNumbers[i]).toString(16)+ " ";
           }
-          else{
-          //Encoding to the characters with a custom method
-          outputValue = PlainToAscii(plainText);
           value2.value = outputValue;
-          }
-          break;
         }
-        case 'HTML': {
-          if(selectedType.value.value == 'Dec'||selectedType.value.value =='Hex'){
-            alert('Please use character decoding method instead of only numeric');
-          }
-          else{
-          //Encoding to the characters with the JavaScript external method
-          outputValue = encode(inputValue);
-          value2.value = outputValue;
-          }
-          break;
+        else alert('Please use Decimal or Binary format to encode to the Hexadecimal value');
+        break;
+      }
+      case 'Dec': {
+        if(selectedType.value.value == 'Bin' || selectedType.value.value == 'Hex'){
+          value2.value = plainText;
         }
-        case 'Hex': {
-          if(selectedType.value.value == 'Dec'||selectedType.value.value =='Bin'){
-            //Encoding to the number with the JavaScript method
-            outputValue = Number(plainText).toString(16);
-            value2.value = outputValue;
-          }
-          else alert('Please use Decimal or Binary format to encode to the Hexadecimal value');
-          break;
+        else {
+          alert('Please use Hexadecimal or Binary format to encode to the Decimal value');
         }
-        case 'Dec': {
-          if(selectedType.value.value == 'Bin' || selectedType.value.value == 'Hex'){
-            value2.value = plainText;
+        break;
+      }
+      case 'Bin': {
+        //Encoding to the number
+        if(selectedType.value.value == 'Dec' || selectedType.value.value == 'Hex'){
+          var inputNumbers = plainText.split(' ');
+          
+          for(let i = 0; i<inputNumbers.length;++i){
+            outputValue += Number(inputNumbers[i]).toString(2)+ " ";
           }
-          else {
-            alert('Please use Hexadecimal or Binary format to encode to the Decimal value');
-          }
-          break;
         }
-        case 'Bin': {
-          //Encoding to the number
-          if(selectedType.value.value == 'Dec' || selectedType.value.value == 'Hex'){
-            outputValue = Number(plainText).toString(2);
-          }
-          //Encoding to the characters with a custom method
-          else outputValue = PlainToBin(plainText);
-          value2.value = outputValue;
-          break;
+        //Encoding to the characters with a custom method
+        else outputValue = PlainToBin(plainText);
+        value2.value = outputValue;
+        break;
+      }
+      default: {
+        if(selectedType.value.value == 'Hex' || selectedType.value.value == 'Dec'){
+          alert('Choose numeric encoding method please');
         }
-        default: {
-          if(selectedType.value.value == 'Hex' || selectedType.value.value == 'Dec'){
-            alert('Choose numeric encoding method please');
-          }
-          else value2.value = plainText;
-          break;
-        }
+        else value2.value = plainText;
+        break;
       }
     }
   }
