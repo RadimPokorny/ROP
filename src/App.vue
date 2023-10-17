@@ -270,12 +270,11 @@ function onChange() {
           
           //Decoding to the character format
           plainText = plainText.slice(0,-1);
-          plainText = BinToPlain(inputValue);
         }
         break;
       }
       default: {
-        plainText = inputValue;
+        plainText = BinToPlain(inputValue);
         break;
       }
     }
