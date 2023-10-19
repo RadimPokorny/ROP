@@ -274,7 +274,7 @@ function onChange() {
         break;
       }
       default: {
-        plainText = BinToPlain(inputValue);
+        plainText = inputValue;
         break;
       }
     }
