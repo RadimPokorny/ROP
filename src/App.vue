@@ -271,6 +271,11 @@ function onChange() {
           //Decoding to the character format
           plainText = plainText.slice(0,-1);
         }
+        else{
+          plainText = BinToPlain(value.value);
+        }
+
+
         break;
       }
       default: {
