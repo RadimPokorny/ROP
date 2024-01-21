@@ -9,6 +9,10 @@ import * as mdijs from '@mdi/js';
 import { afterEach } from 'node:test';
 import { saveAs } from 'file-saver';
 
+//Hash methods
+
+import {Md5} from 'ts-md5';
+
 const selectedType = ref();
 const selectedType2 = ref();
 const groupedTypes = ref([
@@ -55,7 +59,7 @@ selectedType2.value = groupedTypes.value[0].items[0];
 
 const getFilteredGroupedTypesForFirstDropdown = computed(() => {
   // Filter the groupedTypes array to include only items with the code 'co'
-  return groupedTypes.value.filter(group => group.code === 'co');
+  return groupedTypes.value.filter(group => group.code === 'co' || group.code === 'pt');
 });
 
 const value = ref("");
@@ -397,6 +401,10 @@ function onChange() {
         //Encoding to the characters with a custom method
         else outputValue = PlainToBin(plainText);
         value2.value = outputValue;
+        break;
+      }
+      case 'MD':{
+        value2.value = Md5.hashStr(plainText); 
         break;
       }
       default: {
