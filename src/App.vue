@@ -9,36 +9,54 @@ import * as mdijs from '@mdi/js';
 import { afterEach } from 'node:test';
 import { saveAs } from 'file-saver';
 
-
 const selectedType = ref();
 const selectedType2 = ref();
 const groupedTypes = ref([
-      {
-        code: 'pt',
-        items:[
-          { label: 'Plain text', value: 'plain-text' }
-        ]
-      },
+  {
+    code: 'pt',
+    items:[
+      { label: 'Plain text', value: 'plain-text' }
+    ]
+  },
 
-      {
-        label: 'Coding',
-        code: 'co',
-        items: [
-            { label: 'Base64', value: 'Base64' },
-            { label: 'URL', value: 'URL' },
-            { label: 'ASCII', value: 'ASCII' },
-            { label: 'HTML', value: 'HTML' },
-            { label: 'Hex', value: 'Hex' },
-            { label: 'Dec', value: 'Dec' },
-            { label: 'Bin', value: 'Bin' }
-        ]
-    }
+  {
+    label: 'Coding',
+    code: 'co',
+    items: [
+        { label: 'Base64', value: 'Base64' },
+        { label: 'URL', value: 'URL' },
+        { label: 'ASCII', value: 'ASCII' },
+        { label: 'HTML', value: 'HTML' },
+        { label: 'Hex', value: 'Hex' },
+        { label: 'Dec', value: 'Dec' },
+        { label: 'Bin', value: 'Bin' }
+    ]
+  },
+  
+  {
+    label: 'Hashing',
+    code: 'ha',
+    items: [
+      { label: 'MD', value: 'MD'},
+      { label: 'SHA', value: 'SHA'},
+      { label: 'LM', value: 'LM'},
+      { label: 'NT', value: 'NT'},
+      { label: 'CRC', value: 'CRC'},
+      { label: 'Bcrypt', value: 'Bcrypt'},
+      { label: 'Argon2', value: 'Argon2'}
+    ]
+  }
 ]);
 
 
 //Setup the plain text as default value
 selectedType.value = groupedTypes.value[0].items[0];
 selectedType2.value = groupedTypes.value[0].items[0];
+
+const getFilteredGroupedTypesForFirstDropdown = computed(() => {
+  // Filter the groupedTypes array to include only items with the code 'co'
+  return groupedTypes.value.filter(group => group.code === 'co');
+});
 
 const value = ref("");
 const value2 = ref("");
@@ -414,7 +432,7 @@ const isSwapButtonDisabled = computed(() => {
                 @change="onChange()"
                 class="dropdown"
                 v-model="selectedType" 
-                :options="groupedTypes" 
+                :options="getFilteredGroupedTypesForFirstDropdown" 
                 filter 
                 optionLabel="label" 
                 optionGroupLabel="label" 
