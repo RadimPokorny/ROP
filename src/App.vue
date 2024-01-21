@@ -10,8 +10,8 @@ import { afterEach } from 'node:test';
 import { saveAs } from 'file-saver';
 
 //Hash methods
-
 import {Md5} from 'ts-md5';
+import { sha256, sha224 } from 'js-sha256';
 
 const selectedType = ref();
 const selectedType2 = ref();
@@ -41,8 +41,8 @@ const groupedTypes = ref([
     label: 'Hashing',
     code: 'ha',
     items: [
-      { label: 'MD', value: 'MD'},
-      { label: 'SHA', value: 'SHA'},
+      { label: 'MD5', value: 'MD5'},
+      { label: 'SHA256', value: 'SHA256'},
       { label: 'LM', value: 'LM'},
       { label: 'NT', value: 'NT'},
       { label: 'CRC', value: 'CRC'},
@@ -403,8 +403,12 @@ function onChange() {
         value2.value = outputValue;
         break;
       }
-      case 'MD':{
+      case 'MD5':{
         value2.value = Md5.hashStr(plainText); 
+        break;
+      }
+      case 'SHA256':{
+        value2.value = sha256(plainText);
         break;
       }
       default: {
