@@ -8,10 +8,13 @@ import mdiVue from 'mdi-vue/v2';
 import * as mdijs from '@mdi/js';
 import { afterEach } from 'node:test';
 import { saveAs } from 'file-saver';
+import { Buffer } from 'buffer';
 
 //Hash methods
 import {Md5} from 'ts-md5';
 import { sha256, sha224 } from 'js-sha256';
+import * as CRC32 from "crc-32";
+import { genSaltSync, hashSync } from "bcrypt-ts";
 
 const selectedType = ref();
 const selectedType2 = ref();
@@ -409,6 +412,15 @@ function onChange() {
       }
       case 'SHA256':{
         value2.value = sha256(plainText);
+        break;
+      }
+      case 'CRC' :{
+        value2.value = String(CRC32.str(plainText));
+        break;
+      }
+      case 'Bcrypt' :{
+        const salt = genSaltSync(10);
+        value2.value = hashSync(plainText, salt);
         break;
       }
       default: {
