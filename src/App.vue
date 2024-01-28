@@ -15,6 +15,7 @@ import {Md5} from 'ts-md5';
 import { sha256, sha224 } from 'js-sha256';
 import * as CRC32 from "crc-32";
 import { genSaltSync, hashSync } from "bcrypt-ts";
+import * as argon2 from "argon2";
 
 const selectedType = ref();
 const selectedType2 = ref();
@@ -89,16 +90,13 @@ function swapValue(): void {
 
 
 function showSalt(): void {
+  var saltElm: HTMLElement | null = document.getElementById('btn-drop');
 
-  var saltElm = document.getElementById('btn-drop');
-
-  if (selectedType2.value.value == "Bcrypt") {
-      saltElm.style.display = 'flex';
-  }
-  else{
+  if (saltElm !== null && selectedType2.value.value === "Bcrypt") {
+    saltElm.style.display = 'flex';
+  } else if (saltElm !== null) {
     saltElm.style.display = 'none';
   }
-
 }
 
 
@@ -240,7 +238,7 @@ function areaCheck() {
   }
 }
 
-function onChange() {
+async function onChange() {
   let inputValue = (value.value).toString();
   let plainText = "";
   showSalt();
@@ -446,6 +444,11 @@ function onChange() {
         const saltValue = Number(selectedNumber.value);
         const salt = genSaltSync(saltValue);
         value2.value = hashSync(plainText, salt);
+        break;
+      }
+      case 'Argon2':{
+        const argonHash = await argon2.hash("ahoj");
+        value2.value = argonHash;
         break;
       }
       default: {
