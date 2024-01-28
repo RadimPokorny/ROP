@@ -55,6 +55,12 @@ const groupedTypes = ref([
   }
 ]);
 
+const selectedNumber = ref();
+
+//Setup SALT dropdown values
+const numberOptions = Array.from({ length: 20 }, (_, index) => (index + 1).toString());
+selectedNumber.value = "10";
+
 
 //Setup the plain text as default value
 selectedType.value = groupedTypes.value[0].items[0];
@@ -78,7 +84,24 @@ function swapValue(): void {
   const tempValue = value.value;
   value.value = value2.value;
   value2.value = tempValue;
+  
 }
+
+
+function showSalt(): void {
+
+  var saltElm = document.getElementById('btn-drop');
+
+  if (selectedType2.value.value == "Bcrypt") {
+      saltElm.style.display = 'flex';
+  }
+  else{
+    saltElm.style.display = 'none';
+  }
+
+}
+
+
 
 const isCopied = ref(false);
 const isCopied2 = ref(false);
@@ -220,6 +243,7 @@ function areaCheck() {
 function onChange() {
   let inputValue = (value.value).toString();
   let plainText = "";
+  showSalt();
 
   if(selectedType.value.value == selectedType2.value.value){
     alert('Same method in input and output')
@@ -419,7 +443,8 @@ function onChange() {
         break;
       }
       case 'Bcrypt' :{
-        const salt = genSaltSync(10);
+        const saltValue = Number(selectedNumber.value);
+        const salt = genSaltSync(saltValue);
         value2.value = hashSync(plainText, salt);
         break;
       }
@@ -502,7 +527,7 @@ const isSwapButtonDisabled = computed(() => {
       </div>
       <div class="column2">
         <div class="dropdown-copy">
-          <div class="dropdonw-block"></div>
+          <div class="dropdown-block"></div>
           <div class="button-block"></div>
         </div>
         <div class="component">
@@ -551,6 +576,15 @@ const isSwapButtonDisabled = computed(() => {
             </Dropdown>
           </div>
           <div class="button-block">
+            <div id="btn-drop" class="button">
+                  <Dropdown 
+                    @change="onChange()"
+                    v-model="selectedNumber" 
+                    :options="numberOptions" 
+                    placeholder="Select a Number" 
+                    class="w-full md:w-14rem" 
+                    style="width: 89.2px; margin-right: 20px;"></Dropdown>
+            </div>
             <div class="button">
               <Button
                 :icon="isCopied2 ? 'pi pi-check' : 'pi pi-copy'"
@@ -651,6 +685,10 @@ $background-color_1: #f16736;
   align-items: center;
 }
 
+#btn-drop{
+  display: none;
+}
+
 .dropdown-copy {
 	display: flex;
 	justify-content: center;
@@ -727,6 +765,15 @@ Textarea {
 .p-float-label input:focus ~ label, .p-float-label input.p-filled ~ label, .p-float-label textarea:focus ~ label, .p-float-label textarea.p-filled ~ label, .p-float-label .p-inputwrapper-focus ~ label, .p-float-label .p-inputwrapper-filled ~ label
 {
   font-size: 16px;
+}
+
+@media only screen and (min-width: 950px) and (max-width: 1200px) {
+  /* Vaše stylizace pro šířku od 900px do 1100px */
+  .dropdown{
+    width: 150px !important;
+  }
+
+  /* Další stylizace ... */
 }
 
 @media only screen and (max-width: 950px) {

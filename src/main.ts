@@ -27,6 +27,8 @@ import Dropdown from 'primevue/dropdown'
 
 import Button from 'primevue/button';
 
+import InputNumber from 'primevue/inputnumber';
+
 const app = createApp(App)
 
 app.use(mdiVue, {
@@ -39,4 +41,5 @@ app.use(PrimeVue)
 app.component('Textarea', Textarea)
 app.component('Dropdown', Dropdown)
 app.component('Button', Button)
+app.component('InputNumber', InputNumber)
 app.mount('#app')
