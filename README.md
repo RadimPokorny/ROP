@@ -20,6 +20,8 @@ The main purpose of this project will be the ability to put a text string in the
    ```npm install @types/file-saver --save-dev```
    ```npm install vue-router@4```
    ```npm install primevue```
+   ```npm install argon2```
+   ```npm install -g node-gyp```
 
 3. Open the project (best in Visual Studio Code). Then open the terminal and run this:
 
