@@ -467,7 +467,14 @@ const isSwapButtonDisabled = computed(() => {
 
 <template>
   <!-- Hidden file input for importFile dialog -->
-  <input id="fileInput" type="file" style="display: none" @input="importInput" accept=".txt, .text"/>
+  <input 
+    aria-labelledby="Output Text Area" 
+    id="fileInput" 
+    type="file" 
+    style="display: none" 
+    @input="importInput" 
+    accept=".txt, .text"
+  />
   <header class="header">
     <p class="title">Web user interface to support penetration testing</p>
   </header>
@@ -520,6 +527,8 @@ const isSwapButtonDisabled = computed(() => {
               rows="30" 
               cols="50" 
               @input ="areaCheck"
+              class="textarea"
+              aria-labelledby="Input Text Area"
             />
             <label>Input</label>
             </span>
@@ -549,7 +558,7 @@ const isSwapButtonDisabled = computed(() => {
             @click="trimInput"
             class="trim-btn"
           >
-          <mdicon name="content-cut" />  
+          <mdicon alt="trim" name="content-cut" />  
           </Button>
           
         </div>
@@ -607,6 +616,8 @@ const isSwapButtonDisabled = computed(() => {
               v-model="value2" 
               rows="30" 
               cols="50" 
+              class="textarea"
+              aria-labelledby="Output Text Area"
               disabled
             />
           <label>Output</label>
