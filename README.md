@@ -23,6 +23,7 @@ The main purpose of this project will be the ability to put a text string in the
    ```npm install argon2```
    ```npm install -g node-gyp```
    ```npm install primeflex```
+   ```npm install des.js```
 
 3. Open the project (best in Visual Studio Code). Then open the terminal and run this:
 
