@@ -20,6 +20,8 @@ import * as request from 'request';
 import * as agentkeepalive from 'agentkeepalive';
 import * as crypto from 'crypto';
 import * as jqery from 'jquery';
+import * as jsmd4 from 'js-md4';
+import * as desjs from 'des.js';
 
 const selectedType = ref();
 const selectedType2 = ref();
@@ -67,7 +69,6 @@ const isHashingInProgress = ref(false);
 
 //Setup SALT dropdown values
 const numberOptions = Array.from({ length: 20 }, (_, index) => (index + 1).toString());
-
 
 onMounted(() => {
   selectedNumber.value = 10;
@@ -232,6 +233,125 @@ function BinToPlain(binaryString: string): string {
     }
   }
   return plainText;
+}
+
+function create_LM_hashed_password_v1(password: string): Buffer {
+  // 14 bytes password conversion
+  password = password.toUpperCase();
+  const passwordBytes: Buffer = Buffer.from(password, 'ascii');
+
+  const passwordBytesPadded: Buffer = Buffer.alloc(14);
+  passwordBytesPadded.fill("\0");
+
+  const sourceEnd: number = Math.min(14, passwordBytes.length);
+  passwordBytes.copy(passwordBytesPadded, 0, 0, sourceEnd);
+
+  // Dividing into 2 parts with 7 bytes:
+  const firstPart: Buffer = passwordBytesPadded.subarray(0, 7);
+  const secondPart: Buffer = passwordBytesPadded.subarray(7);
+
+  function encrypt(buf: Buffer): Buffer {
+    const key: Buffer = insertZerosEvery7Bits(buf);
+    const des = desjs.DES.create({ type: 'encrypt', key: key });
+    const magicKey: Buffer = Buffer.from('KGS!@#$%', 'ascii');
+    const encrypted: Buffer = des.update(magicKey);
+    return Buffer.from(encrypted);
+  }
+
+  const firstPartEncrypted: Buffer = encrypt(firstPart);
+  const secondPartEncrypted: Buffer = encrypt(secondPart);
+
+  return Buffer.concat([firstPartEncrypted, secondPartEncrypted]);
+}
+
+function bytes2binaryArray(buf: Buffer): number[] {
+  const hex2binary: Record<string, number[]> = {
+    '0': [0, 0, 0, 0],
+    '1': [0, 0, 0, 1],
+    '2': [0, 0, 1, 0],
+    '3': [0, 0, 1, 1],
+    '4': [0, 1, 0, 0],
+    '5': [0, 1, 0, 1],
+    '6': [0, 1, 1, 0],
+    '7': [0, 1, 1, 1],
+    '8': [1, 0, 0, 0],
+    '9': [1, 0, 0, 1],
+    'A': [1, 0, 1, 0],
+    'B': [1, 0, 1, 1],
+    'C': [1, 1, 0, 0],
+    'D': [1, 1, 0, 1],
+    'E': [1, 1, 1, 0],
+    'F': [1, 1, 1, 1]
+  };
+
+  const hexString: string = buf.toString('hex').toUpperCase();
+  let array: number[] = [];
+  for (let i = 0; i < hexString.length; i++) {
+    const hexchar: string = hexString.charAt(i);
+    array = array.concat(hex2binary[hexchar]);
+  }
+
+  return array;
+}
+
+function binaryArray2bytes(array: string): Buffer {
+  const binary2hex: Record<string, number | string> = {
+    '0000': 0,
+    '0001': 1,
+    '0010': 2,
+    '0011': 3,
+    '0100': 4,
+    '0101': 5,
+    '0110': 6,
+    '0111': 7,
+    '1000': 8,
+    '1001': 9,
+    '1010': 'A',
+    '1011': 'B',
+    '1100': 'C',
+    '1101': 'D',
+    '1110': 'E',
+    '1111': 'F'
+  };
+
+  const bufArray: Buffer[] = [];
+
+  for (let i = 0; i < array.length; i += 8) {
+    if ((i + 7) > array.length)
+      break;
+
+    const binString1: string = '' + array[i] + '' + array[i + 1] + '' + array[i + 2] + '' + array[i + 3];
+    const binString2: string = '' + array[i + 4] + '' + array[i + 5] + '' + array[i + 6] + '' + array[i + 7];
+    const hexchar1: number | string = binary2hex[binString1];
+    const hexchar2: number | string = binary2hex[binString2];
+
+    const buf: Buffer = Buffer.from(hexchar1 + '' + hexchar2, 'hex');
+    bufArray.push(buf);
+  }
+
+  return Buffer.concat(bufArray);
+}
+
+function insertZerosEvery7Bits(buf: Buffer): Buffer {
+  const binaryArray: number[] = bytes2binaryArray(buf);
+  const newBinaryArray: number[] = [];
+
+  for (let i = 0; i < binaryArray.length; i++) {
+    newBinaryArray.push(binaryArray[i]);
+
+    if ((i + 1) % 7 === 0) {
+      newBinaryArray.push(0);
+    }
+  }
+
+  return binaryArray2bytes(newBinaryArray.join(''));
+}
+
+function create_NT_hashed_password_v1(password: String){
+	var buf = Buffer.from(password, 'utf16le');
+	var md4 = jsmd4.create();
+	md4.update(buf);
+	return Buffer.from(md4.digest());
 }
 
 function areaCheck() {
@@ -446,8 +566,11 @@ async function onChange() {
         break;
       }
       case 'NT':{
+        value2.value = create_NT_hashed_password_v1(plainText).toString('hex');
+        break;
       }
       case 'LM':{
+        value2.value = create_LM_hashed_password_v1(plainText).toString('hex');
         break;
       }
       case 'CRC' :{

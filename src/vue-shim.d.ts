@@ -7,6 +7,8 @@ declare module "*.vue" {
 
 declare module 'file-saver';
 declare module 'bcrypt-ts';
+declare module 'js-md4';
+declare module 'des.js';
 
 declare module "*.vue" {
     import Vue from "vue";
