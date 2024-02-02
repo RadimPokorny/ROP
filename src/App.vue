@@ -15,7 +15,11 @@ import {Md5} from 'ts-md5';
 import { sha256, sha224 } from 'js-sha256';
 import * as CRC32 from "crc-32";
 import { genSaltSync, hashSync } from "bcrypt-ts";
-import * as argon2 from "argon2";
+import * as argon2 from 'argon2';
+import * as request from 'request';
+import * as agentkeepalive from 'agentkeepalive';
+import * as crypto from 'crypto';
+import * as jqery from 'jquery';
 
 const selectedType = ref();
 const selectedType2 = ref();
@@ -87,7 +91,6 @@ function swapValue(): void {
   value2.value = tempValue;
   
 }
-
 
 function showSalt(): void {
   var saltElm: HTMLElement | null = document.getElementById('btn-drop');
@@ -436,6 +439,11 @@ async function onChange() {
         value2.value = sha256(plainText);
         break;
       }
+      case 'NT':{
+      }
+      case 'LM':{
+        break;
+      }
       case 'CRC' :{
         value2.value = String(CRC32.str(plainText));
         break;
@@ -446,9 +454,7 @@ async function onChange() {
         value2.value = hashSync(plainText, salt);
         break;
       }
-      case 'Argon2':{
-        const argonHash = await argon2.hash("ahoj");
-        value2.value = argonHash;
+      case 'Argon2': {
         break;
       }
       default: {
@@ -588,14 +594,18 @@ const isSwapButtonDisabled = computed(() => {
             </Dropdown>
           </div>
           <div class="button-block">
-            <div id="btn-drop" class="button">
-                  <Dropdown 
-                    @change="onChange()"
-                    v-model="selectedNumber" 
-                    :options="numberOptions" 
-                    placeholder="Select a Number" 
-                    class="w-full md:w-14rem" 
-                    style="width: 89.2px; margin-right: 20px;"></Dropdown>
+            <div id="btn-drop" class="button" >
+                <InputNumber 
+                  v-tooltip.top="'Enter the number of salts'"
+                  style="display: flex !important;  height: 59.59px; " 
+                  v-model="selectedNumber" 
+                  inputId="minmax-buttons" 
+                  mode="decimal" 
+                  showButtons 
+                    :min="1" 
+                    :max="20" 
+                  @input="onChange()" 
+                  />
             </div>
             <div class="button">
               <Button
@@ -685,10 +695,15 @@ $background-color_1: #f16736;
   width: 100%;
   height: 40%;
 }
-
 .p-inputtextarea:disabled{
   opacity: 1;
 }
+
+.p-inputnumber-input{
+  position: relative;
+  height: 80px !important;
+}
+
 
 .center-dropdown{
   position: relative;
@@ -701,6 +716,7 @@ $background-color_1: #f16736;
 
 #btn-drop{
   display: none;
+  margin-right: 20px;
 }
 
 .dropdown-copy {

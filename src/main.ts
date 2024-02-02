@@ -11,6 +11,8 @@ import PrimeVue from 'primevue/config'
 
 import router from './router'
 
+import '/node_modules/primeflex/primeflex.css'
+
 
 //theme
 import './assets/theme.css';
@@ -29,6 +31,8 @@ import Button from 'primevue/button';
 
 import InputNumber from 'primevue/inputnumber';
 
+import Tooltip from 'primevue/tooltip';
+
 const app = createApp(App)
 
 app.use(mdiVue, {
@@ -40,6 +44,7 @@ app.use(router)
 app.use(PrimeVue)
 app.component('Textarea', Textarea)
 app.component('Dropdown', Dropdown)
+app.directive('tooltip', Tooltip);
 app.component('Button', Button)
 app.component('InputNumber', InputNumber)
 app.mount('#app')
