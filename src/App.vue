@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router';
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { beforeAll } from 'vitest';
 import {encode} from 'html-entities';
 import {decode} from 'html-entities';
@@ -60,12 +60,18 @@ const groupedTypes = ref([
   }
 ]);
 
-const selectedNumber = ref();
+const selectedNumber = ref()
+
+//Const to disable or enable if hashing is in process
+const isHashingInProgress = ref(false);
 
 //Setup SALT dropdown values
 const numberOptions = Array.from({ length: 20 }, (_, index) => (index + 1).toString());
-selectedNumber.value = "10";
 
+
+onMounted(() => {
+  selectedNumber.value = 10;
+});
 
 //Setup the plain text as default value
 selectedType.value = groupedTypes.value[0].items[0];
@@ -449,9 +455,11 @@ async function onChange() {
         break;
       }
       case 'Bcrypt' :{
+        isHashingInProgress.value = true;
         const saltValue = Number(selectedNumber.value);
         const salt = genSaltSync(saltValue);
         value2.value = hashSync(plainText, salt);
+        isHashingInProgress.value = false;
         break;
       }
       case 'Argon2': {
@@ -604,7 +612,9 @@ const isSwapButtonDisabled = computed(() => {
                   showButtons 
                     :min="1" 
                     :max="20" 
+                  @change="onChange()" 
                   @input="onChange()" 
+                  :disabled="isHashingInProgress"
                   />
             </div>
             <div class="button">
