@@ -107,16 +107,25 @@ function swapValue(): void {
   const tempValue = value.value;
   value.value = value2.value;
   value2.value = tempValue;
+
+  showSalt();
   
 }
 
 function showSalt(): void {
   var saltElm: HTMLElement | null = document.getElementById('btn-drop');
+  var saltElm2: HTMLElement | null = document.getElementById('btn-argon');
 
   if (saltElm !== null && selectedType2.value.value === "Bcrypt") {
     saltElm.style.display = 'flex';
   } else if (saltElm !== null) {
     saltElm.style.display = 'none';
+  }
+
+  if (saltElm2 !== null && selectedType2.value.value === "Argon2") {
+    saltElm2.style.display = 'flex';
+  } else if (saltElm2 !== null) {
+    saltElm2.style.display = 'none';
   }
 }
 
@@ -221,6 +230,7 @@ function resetComps(): void {
   value2.value = "";
   selectedType.value = groupedTypes.value[0].items[0];
   selectedType2.value = groupedTypes.value[0].items[0];
+  showSalt();
 }
 
 function trimInput(): void {
@@ -788,11 +798,12 @@ const isSwapButtonDisabled = computed(() => {
                   @input="onChange()" 
                   />
             </div>
-            <div class="button">
+            <div id="btn-argon" class="button">
               <Button
                 label="Par."
                 aria-label="par."
                 @click="visible = true"
+                style="width: 59.2px; height: 59.2px; margin-right: 20px;"
               />
             </div>
             <template>
@@ -940,6 +951,10 @@ $background-color_1: #f16736;
 #btn-drop{
   display: none;
   margin-right: 20px;
+}
+
+#btn-argon{
+  display: none;
 }
 
 .dropdown-copy {
