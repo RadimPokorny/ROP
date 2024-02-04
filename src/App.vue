@@ -15,13 +15,12 @@ import {Md5} from 'ts-md5';
 import { sha256, sha224 } from 'js-sha256';
 import * as CRC32 from "crc-32";
 import { genSaltSync, hashSync } from "bcrypt-ts";
-import * as argon2 from 'argon2';
 import * as request from 'request';
 import * as agentkeepalive from 'agentkeepalive';
 import * as crypto from 'crypto';
-import * as jqery from 'jquery';
 import * as jsmd4 from 'js-md4';
 import * as desjs from 'des.js';
+import argon2 from 'argon2-browser/dist/argon2-bundled.min.js';
 
 const selectedType = ref();
 const selectedType2 = ref();
@@ -63,20 +62,32 @@ const groupedTypes = ref([
 ]);
 
 const selectedNumber = ref()
-
+const argonsalt = ref()
 //Const to disable or enable if hashing is in process
-const isHashingInProgress = ref(false);
 
 //Setup SALT dropdown values
 const numberOptions = Array.from({ length: 20 }, (_, index) => (index + 1).toString());
 
-onMounted(() => {
-  selectedNumber.value = 10;
-});
+//Dialog for argon2 default
+const visible = ref(false);
 
 //Setup the plain text as default value
 selectedType.value = groupedTypes.value[0].items[0];
 selectedType2.value = groupedTypes.value[0].items[0];
+
+//Setup the default salt value
+selectedNumber.value = 10;
+
+//Setup default Argon2 values
+const argonite = ref();
+argonite.value = 8;
+const argonmem = ref();
+argonmem.value = 1024;
+const argonlen = ref();
+argonlen.value = 24;
+const argonpar = ref();
+argonpar.value = 1;
+
 
 const getFilteredGroupedTypesForFirstDropdown = computed(() => {
   // Filter the groupedTypes array to include only items with the code 'co'
@@ -140,6 +151,36 @@ function copyValue2(): void {
   } else {
     alert("No input text.");
   }
+}
+
+//Generate salt for the Argon2
+function generateSalt(): String {
+  var buffer = new Uint8Array(16); // 128 bits
+  const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'; //Chracters list
+  let randomString = '';
+
+  for (let i = 0; i < buffer.length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    randomString += characters.charAt(randomIndex);
+  }
+  argonsalt.value = randomString;
+  return randomString;
+}
+
+//Generate hash with values from the dialog
+async function DialogHashGenerate(): void{
+  this.visible = false;
+  const result = await argon2.hash({
+          pass: value.value,
+          salt: generateSalt(),
+          time: argonite.value,
+          mem: argonmem.value,
+          hashLen: argonlen.value,
+          parallelism: argonpar.value,
+          type: argon2.ArgonType.Argon2d,
+        });
+
+        value2.value = result.hashHex;
 }
 
 function importInput(event: any) {
@@ -578,14 +619,23 @@ async function onChange() {
         break;
       }
       case 'Bcrypt' :{
-        isHashingInProgress.value = true;
         const saltValue = Number(selectedNumber.value);
         const salt = genSaltSync(saltValue);
         value2.value = hashSync(plainText, salt);
-        isHashingInProgress.value = false;
         break;
       }
       case 'Argon2': {
+        const result = await argon2.hash({
+          pass: inputValue,
+          salt: generateSalt(),
+          time: argonite.value,
+          mem: argonmem.value,
+          hashLen: argonlen.value,
+          parallelism: argonpar.value,
+          type: argon2.ArgonType.Argon2d,
+        });
+
+        value2.value = result.hashHex;
         break;
       }
       default: {
@@ -735,11 +785,51 @@ const isSwapButtonDisabled = computed(() => {
                   showButtons 
                     :min="1" 
                     :max="20" 
-                  @change="onChange()" 
                   @input="onChange()" 
-                  :disabled="isHashingInProgress"
                   />
             </div>
+            <div class="button">
+              <Button
+                label="Par."
+                aria-label="par."
+                @click="visible = true"
+              />
+            </div>
+            <template>
+              <div class="card flex justify-content-center">
+                  <Button label="Show" @click="visible = true" />
+                  <Dialog v-model:visible="visible" modal header="Argon2" :style="{ width: '26rem' }">
+                      <span class="p-text-secondary block mb-5">Enter parameters for hashing</span>
+                      <div class="flex align-items-center gap-3 mb-5">
+                          <label for="salt" class="font-semibold w-6rem">Salt</label>
+                          <span style="display: flex; justify-content: center; align-items: center;" class="p-input-icon-right">
+                            <i class="pi pi-cog"  style="margin-top: -11px" @click="generateSalt()"/>
+                            <InputText v-model="argonsalt" id="salt" class="flex-auto" autocomplete="off" />
+                          </span>
+                      </div>
+                      <div class="flex align-items-center gap-3 mb-5">
+                          <label for="parallelismfactor" class="font-semibold w-6rem">Parallelism Factor</label>
+                          <InputText v-model="argonpar" id="parallelismfactor" class="flex-auto" autocomplete="off" />
+                      </div>
+                      <div class="flex align-items-center gap-3 mb-5">
+                          <label for="nemorycost" class="font-semibold w-6rem">Memory Cost</label>
+                          <InputText v-model="argonmem" id="nemorycost" class="flex-auto" autocomplete="off" />
+                      </div>
+                      <div class="flex align-items-center gap-3 mb-5">
+                          <label for="iterations" class="font-semibold w-6rem">Iterations</label>
+                          <InputText v-model="argonite" id="iterations" class="flex-auto" autocomplete="off" />
+                      </div>
+                      <div class="flex align-items-center gap-3 mb-5">
+                          <label for="hashlength" class="font-semibold w-6rem">Hash Length</label>
+                          <InputText v-model="argonlen" id="hashlength" class="flex-auto" autocomplete="off" />
+                      </div>
+                      <div class="flex justify-content-end gap-2">
+                          <Button type="button" label="Cancel" @click="visible = false"></Button>
+                          <Button type="button" label="Generate hash" @click="DialogHashGenerate()"></Button>
+                      </div>
+                  </Dialog>
+              </div>
+            </template>
             <div class="button">
               <Button
                 :icon="isCopied2 ? 'pi pi-check' : 'pi pi-copy'"

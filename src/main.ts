@@ -33,6 +33,11 @@ import InputNumber from 'primevue/inputnumber';
 
 import Tooltip from 'primevue/tooltip';
 
+import Dialog from 'primevue/dialog';
+
+import InputText from 'primevue/inputtext'
+
+
 const app = createApp(App)
 
 app.use(mdiVue, {
@@ -43,6 +48,8 @@ app.use(createPinia())
 app.use(router)
 app.use(PrimeVue)
 app.component('Textarea', Textarea)
+app.component('Dialog', Dialog)
+app.component('InputText', InputText)
 app.component('Dropdown', Dropdown)
 app.directive('tooltip', Tooltip);
 app.component('Button', Button)
