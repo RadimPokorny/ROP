@@ -177,7 +177,7 @@ function generateSalt(): String {
 }
 
 //Generate hash with values from the dialog
-async function DialogHashGenerate(): void{
+async function DialogHashGenerate(this:any): Promise<void>{
   this.visible = false;
   const result = await argon2.hash({
           pass: value.value,
