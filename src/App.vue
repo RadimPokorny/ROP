@@ -469,7 +469,8 @@ async function onChange() {
       case 'Bin': {
         //Checks if the number is binary
         //Decoding to the number format
-        if(selectedType2.value.value == 'Dec' || selectedType2.value.value == 'Hex'){
+        if(/^[01]+$/.test(inputValue)){
+          if(selectedType2.value.value == 'Dec' || selectedType2.value.value == 'Hex'){
            var numberArray = inputValue.split(' ');
           var convertErrorMessage = "";
 
@@ -489,11 +490,15 @@ async function onChange() {
           
           //Decoding to the character format
           plainText = plainText.slice(0,-1);
+          }
+          else{
+            plainText = BinToPlain(value.value);
+          }
         }
         else{
-          plainText = BinToPlain(value.value);
+          alert("Wrong binary format.");
+          value.value = "";
         }
-
 
         break;
       }
