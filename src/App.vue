@@ -10,7 +10,7 @@ import {Md5} from 'ts-md5';
 import { sha256, sha224 } from 'js-sha256';
 import * as CRC32 from "crc-32";
 import { genSaltSync, hashSync } from "bcrypt-ts";
-import * as jsmd4 from 'js-md4';
+import {create} from 'js-md4';
 import * as desjs from 'des.js';
 import argon2 from 'argon2-browser/dist/argon2-bundled.min.js';
 
@@ -392,7 +392,7 @@ function insertZerosEvery7Bits(buf: Buffer): Buffer {
 
 function create_NT_hashed_password_v1(password: String){
 	var buf = Buffer.from(password, 'utf16le');
-	var md4 = jsmd4.create();
+	var md4 = create();
 	md4.update(buf);
 	return Buffer.from(md4.digest());
 }
@@ -471,8 +471,8 @@ async function onChange() {
         //Decoding to the number format
         if(/^[01]+$/.test(inputValue)){
           if(selectedType2.value.value == 'Dec' || selectedType2.value.value == 'Hex'){
-           var numberArray = inputValue.split(' ');
-          var convertErrorMessage = "";
+            var numberArray = inputValue.split(' ');
+            var convertErrorMessage = "";
 
           for(let i = 0; i<numberArray.length;++i){
             if (/^[01]+$/.test(numberArray[i])) {
@@ -494,6 +494,10 @@ async function onChange() {
           else{
             plainText = BinToPlain(value.value);
           }
+        }
+        else if(inputValue == ""){
+          alert("Please fill in the text field.");
+          
         }
         else{
           alert("Wrong binary format.");
