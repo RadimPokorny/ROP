@@ -1,12 +1,7 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router';
-import { ref, computed, onMounted } from "vue";
-import { beforeAll } from 'vitest';
+import { ref, computed} from "vue";
 import {encode} from 'html-entities';
 import {decode} from 'html-entities';
-import mdiVue from 'mdi-vue/v2';
-import * as mdijs from '@mdi/js';
-import { afterEach } from 'node:test';
 import { saveAs } from 'file-saver';
 import { Buffer } from 'buffer';
 
@@ -15,9 +10,6 @@ import {Md5} from 'ts-md5';
 import { sha256, sha224 } from 'js-sha256';
 import * as CRC32 from "crc-32";
 import { genSaltSync, hashSync } from "bcrypt-ts";
-import * as request from 'request';
-import * as agentkeepalive from 'agentkeepalive';
-import * as crypto from 'crypto';
 import * as jsmd4 from 'js-md4';
 import * as desjs from 'des.js';
 import argon2 from 'argon2-browser/dist/argon2-bundled.min.js';
