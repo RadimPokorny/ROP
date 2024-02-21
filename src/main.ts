@@ -11,6 +11,8 @@ import PrimeVue from 'primevue/config'
 
 import router from './router'
 
+import '/node_modules/primeflex/primeflex.css'
+
 
 //theme
 import './assets/theme.css';
