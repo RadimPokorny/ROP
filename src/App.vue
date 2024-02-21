@@ -170,7 +170,6 @@ function generateSalt(): String {
 
 //Generate hash with values from the dialog
 async function DialogHashGenerate(this:any): Promise<void>{
-  this.visible = false;
   const result = await argon2.hash({
           pass: value.value,
           salt: generateSalt(),
@@ -182,6 +181,7 @@ async function DialogHashGenerate(this:any): Promise<void>{
         });
 
         value2.value = result.hashHex;
+        this.visible = false;
 }
 
 function importInput(event: any) {
@@ -805,12 +805,12 @@ const isSwapButtonDisabled = computed(() => {
                 aria-label="par."
                 @click="visible = true"
                 style="width: 59.2px; height: 59.2px; margin-right: 20px;"
-              />
+              />  
             </div>
             <template>
               <div class="card flex justify-content-center">
                   <Button label="Show" @click="visible = true" />
-                  <Dialog v-model:visible="visible" modal header="Argon2" :style="{ width: '26rem' }">
+                  <Dialog id="argon2dialog" v-model:visible="visible" modal header="Argon2" :style="{ width: '26rem' }">
                       <span class="p-text-secondary block mb-5">Enter parameters for hashing</span>
                       <div class="flex align-items-center gap-3 mb-5">
                           <label for="salt" class="font-semibold w-6rem">Salt</label>
@@ -837,7 +837,7 @@ const isSwapButtonDisabled = computed(() => {
                       </div>
                       <div class="flex justify-content-end gap-2">
                           <Button type="button" label="Cancel" @click="visible = false"></Button>
-                          <Button type="button" label="Generate hash" @click="DialogHashGenerate()"></Button>
+                          <Button type="button" label="Generate hash" @click="DialogHashGenerate(); visible = false"></Button>
                       </div>
                   </Dialog>
               </div>
