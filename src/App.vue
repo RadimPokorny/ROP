@@ -877,6 +877,9 @@ const isSwapButtonDisabled = computed(() => {
 </template>
 
 <style scoped lang="scss">  
+
+@import './assets/theme.css';
+
 $color_1: white; 
 $background-color_1: #f16736;
 
