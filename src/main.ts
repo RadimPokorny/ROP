@@ -11,8 +11,6 @@ import PrimeVue from 'primevue/config'
 
 import router from './router'
 
-import '/node_modules/primeflex/primeflex.css'
-
 
 //theme
 import './assets/theme.css';
@@ -35,7 +33,7 @@ import Tooltip from 'primevue/tooltip';
 
 import Dialog from 'primevue/dialog';
 
-import InputText from 'primevue/inputtext'
+import InputText from 'primevue/inputtext';
 
 
 const app = createApp(App)
