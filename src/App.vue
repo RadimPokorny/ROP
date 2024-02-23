@@ -14,6 +14,9 @@ import {create} from 'js-md4';
 import * as desjs from 'des.js';
 import argon2 from 'argon2-browser/dist/argon2-bundled.min.js';
 
+//Encryption methods
+import aes from 'js-crypto-aes';
+
 const selectedType = ref();
 const selectedType2 = ref();
 const groupedTypes = ref([
@@ -50,11 +53,39 @@ const groupedTypes = ref([
       { label: 'Bcrypt', value: 'Bcrypt'},
       { label: 'Argon2', value: 'Argon2'}
     ]
+  },
+  {
+    label: 'Crypting',
+    code: 'cr',
+    items: [
+      { label: 'AES', value: 'AES'},
+      { label: 'RC', value: 'RC'},
+      { label: 'RSA', value: 'RSA'},
+      { label: 'DES', value: 'DES'}
+    ]
   }
 ]);
 
-const selectedNumber = ref()
-const argonsalt = ref()
+//AES definitions
+const AESformats = ref();
+const AEStextformat = ref([
+    { name: 'Base64', value: 'Base64' },
+    { name: 'Hex', value: 'Hex' }
+]);
+const AESciphermodes = ref();
+const AESciphermode = ref([
+    { name: 'CBC', value: 'CBC' },
+    { name: 'ECB', value: 'ECB' }
+]);
+const AESkeysizes = ref();
+const AESkeysize = ref([
+    { name: '128', value: '128' },
+    { name: '192', value: '192' },
+    { name: '256', value: '256' }
+]);
+
+const selectedNumber = ref();
+const argonsalt = ref();
 //Const to disable or enable if hashing is in process
 
 //Setup SALT dropdown values
@@ -62,6 +93,7 @@ const numberOptions = Array.from({ length: 20 }, (_, index) => (index + 1).toStr
 
 //Dialog for argon2 default
 const visible = ref(false);
+var visible2 = ref(false);
 
 //Setup the plain text as default value
 selectedType.value = groupedTypes.value[0].items[0];
@@ -81,6 +113,19 @@ const argonpar = ref();
 argonpar.value = 1;
 
 
+//setup default AES values
+const aesinput = ref();
+aesinput.value = "";
+const keysize = ref();
+keysize.value = 128;
+const secretkey = ref();
+secretkey.value = "";
+const cyphermode = ref();
+cyphermode.value = "ECB";
+const outputtype = ref();
+outputtype.value = "Base64";
+
+
 const getFilteredGroupedTypesForFirstDropdown = computed(() => {
   // Filter the groupedTypes array to include only items with the code 'co'
   return groupedTypes.value.filter(group => group.code === 'co' || group.code === 'pt');
@@ -88,6 +133,8 @@ const getFilteredGroupedTypesForFirstDropdown = computed(() => {
 
 const value = ref("");
 const value2 = ref("");
+var inputvalue = ref();
+
 
 function swapValue(): void {
   //Swap dropdown value
@@ -170,6 +217,7 @@ function generateSalt(): String {
 
 //Generate hash with values from the dialog
 async function DialogHashGenerate(this:any): Promise<void>{
+  this.visible = false;
   const result = await argon2.hash({
           pass: value.value,
           salt: generateSalt(),
@@ -181,7 +229,6 @@ async function DialogHashGenerate(this:any): Promise<void>{
         });
 
         value2.value = result.hashHex;
-        this.visible = false;
 }
 
 function importInput(event: any) {
@@ -355,7 +402,7 @@ function binaryArray2bytes(array: string): Buffer {
     '1101': 'D',
     '1110': 'E',
     '1111': 'F'
-  };
+};
 
   const bufArray: Buffer[] = [];
 
@@ -419,6 +466,7 @@ async function onChange() {
     alert('Same method in input and output')
   }
   else{
+    aesinput.value = value.value;
     //Input switch - Converting a specific value to plain text
     switch(selectedType.value.value) {
       case 'Base64': {
@@ -649,6 +697,11 @@ async function onChange() {
         value2.value = result.hashHex;
         break;
       }
+      case 'AES':{
+        visible2 = true;
+
+
+      }
       default: {
         if(selectedType.value.value == 'Hex' || selectedType.value.value == 'Dec'){
           alert('Choose numeric encoding method please');
@@ -805,12 +858,12 @@ const isSwapButtonDisabled = computed(() => {
                 aria-label="par."
                 @click="visible = true"
                 style="width: 59.2px; height: 59.2px; margin-right: 20px;"
-              />  
+              />
             </div>
             <template>
               <div class="card flex justify-content-center">
                   <Button label="Show" @click="visible = true" />
-                  <Dialog id="argon2dialog" v-model:visible="visible" modal header="Argon2" :style="{ width: '26rem' }">
+                  <Dialog v-model:visible="visible" modal header="Argon2" :style="{ width: '26rem' }">
                       <span class="p-text-secondary block mb-5">Enter parameters for hashing</span>
                       <div class="flex align-items-center gap-3 mb-5">
                           <label for="salt" class="font-semibold w-6rem">Salt</label>
@@ -837,8 +890,42 @@ const isSwapButtonDisabled = computed(() => {
                       </div>
                       <div class="flex justify-content-end gap-2">
                           <Button type="button" label="Cancel" @click="visible = false"></Button>
-                          <Button type="button" label="Generate hash" @click="DialogHashGenerate(); visible = false"></Button>
+                          <Button type="button" label="Generate hash" @click="DialogHashGenerate()"></Button>
                       </div>
+                  </Dialog>
+                  <Dialog v-model:visible="visible2" modal header="AES Encryption" :style="{ width: '26rem' }">
+                      <template #header>
+                      </template>
+                      <span class="p-text-secondary block mb-5">Update your information.</span>
+                      <div class="flex align-items-center gap-3 mb-3">
+                          <label for="username" class="font-semibold w-6rem">Input</label>
+                          <InputText v-model="aesinput" class="flex-auto" autocomplete="off"/>
+                      </div>
+                      <div class="flex align-items-center gap-3 mb-2">
+                          <label for="email" class="font-semibold w-6rem">Cipher mode</label>
+                          <Dropdown v-model="AESciphermodes" :options="AESciphermode" optionLabel="name" placeholder="Cipher mode" class="w-full md:w-15rem" />
+                      </div>
+                      <div id="aes-vector" class="flex align-items-center gap-3 mb-2">
+                        <label for="aes-vector" class="font-semibold w-6rem">Vector</label>
+                        <InputText id="aes-vector" class="flex-auto" autocomplete="off" />
+
+                    </div>
+                      <div class="flex align-items-center gap-3 mb-2">
+                        <label for="aes-keysize" class="font-semibold w-6rem">Key size in bits</label>
+                        <Dropdown id="aes-keysize" v-model="AESkeysizes" :options="AESkeysize" optionLabel="name" placeholder="Output format" class="w-full md:w-15rem" />
+                    </div>
+                    <div class="flex align-items-center gap-3 mb-2">
+                      <label for="aes-secret" class="font-semibold w-6rem">Secret key</label>
+                      <InputText v-model="secretkey" id="aes-secret" class="flex-auto" autocomplete="off" />
+                    </div>
+                    <div class="flex align-items-center gap-3 mb-2">
+                      <label for="email" class="font-semibold w-6rem">Output text format</label>
+                      <Dropdown v-model="AESformats" :options="AEStextformat" optionLabel="name" placeholder="Output format" class="w-full md:w-15rem" />
+                    </div>
+                      <template #footer>
+                          <Button label="Cancel" text severity="secondary" @click="visible = false" autofocus />
+                          <Button label="Save" outlined severity="secondary" @click="visible = false" autofocus />
+                      </template>
                   </Dialog>
               </div>
             </template>
@@ -877,7 +964,6 @@ const isSwapButtonDisabled = computed(() => {
 </template>
 
 <style scoped lang="scss">  
-
 $color_1: white; 
 $background-color_1: #f16736;
 

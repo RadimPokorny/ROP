@@ -30,6 +30,7 @@
     "file-saver": "^2.0.5",
     "html-entities": "^2.4.0",
     "httpntlm": "^1.8.13",
+    "js-crypto-aes": "^1.0.6",
     "js-md4": "^0.3.2",
     "js-sha256": "^0.10.1",
     "mdi-vue": "^3.0.13",
