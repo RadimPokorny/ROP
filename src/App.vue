@@ -72,17 +72,6 @@ const AEStextformat = ref([
     { name: 'Base64', value: 'Base64' },
     { name: 'Hex', value: 'Hex' }
 ]);
-const AESciphermodes = ref();
-const AESciphermode = ref([
-    { name: 'CBC', value: 'CBC' },
-    { name: 'ECB', value: 'ECB' }
-]);
-const AESkeysizes = ref();
-const AESkeysize = ref([
-    { name: '128', value: '128' },
-    { name: '192', value: '192' },
-    { name: '256', value: '256' }
-]);
 
 const selectedNumber = ref();
 const argonsalt = ref();
@@ -92,7 +81,7 @@ const argonsalt = ref();
 const numberOptions = Array.from({ length: 20 }, (_, index) => (index + 1).toString());
 
 //Dialog for argon2 default
-const visible = ref(false);
+var visible = ref(false);
 var visible2 = ref(false);
 
 //Setup the plain text as default value
@@ -116,14 +105,12 @@ argonpar.value = 1;
 //setup default AES values
 const aesinput = ref();
 aesinput.value = "";
-const keysize = ref();
-keysize.value = 128;
 const secretkey = ref();
 secretkey.value = "";
-const cyphermode = ref();
-cyphermode.value = "ECB";
 const outputtype = ref();
 outputtype.value = "Base64";
+const aesvector = ref();
+aesvector.value = "";
 
 
 const getFilteredGroupedTypesForFirstDropdown = computed(() => {
@@ -219,17 +206,59 @@ function generateSalt(): String {
 async function DialogHashGenerate(this:any): Promise<void>{
   this.visible = false;
   const result = await argon2.hash({
-          pass: value.value,
-          salt: generateSalt(),
-          time: argonite.value,
-          mem: argonmem.value,
-          hashLen: argonlen.value,
-          parallelism: argonpar.value,
-          type: argon2.ArgonType.Argon2d,
-        });
+    pass: value.value,
+    salt: generateSalt(),
+    time: argonite.value,
+    mem: argonmem.value,
+    hashLen: argonlen.value,
+    parallelism: argonpar.value,
+    type: argon2.ArgonType.Argon2d,
+  });
 
-        value2.value = result.hashHex;
+  value2.value = result.hashHex;
 }
+
+async function DialogAesGenerate(this: any): Promise<void> {
+
+  if(secretkey.value.length < 16){
+    alert('Private key must have 16 characters');
+  }
+  else if(aesvector.value.length < 16){
+    alert('Vector must have 16 characters');
+  }
+  else{
+    const msg = new TextEncoder().encode(aesinput.value);
+    const key = new TextEncoder().encode(secretkey.value);
+    const iv = new TextEncoder().encode(aesvector.value);
+    const encrypted = await aes.encrypt(msg, key, { name: 'AES-CBC', iv });
+    value.value = aesinput.value;
+    if(AESformats.value.value == 'Hex'){
+      selectedType2.value = groupedTypes.value[1].items[4];
+      value2.value = uint8ArrayToHex(new Uint8Array(encrypted));
+    }
+    else{
+      selectedType2.value = groupedTypes.value[1].items[0];
+      value2.value = btoa(String(encrypted));
+    }
+
+    visible2 = false;
+  }
+}
+
+//Converts uint8array to hexadecimal value
+function uint8ArrayToHex(uint8Array: Uint8Array) {
+  return Array.from(uint8Array)
+    .map(byte => byte.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+
+
+//Checks if AES is once opened
+
+var isAesOpen = ref();
+isAesOpen.value = false;
+
 
 function importInput(event: any) {
   const fileInput = event.target;
@@ -698,9 +727,11 @@ async function onChange() {
         break;
       }
       case 'AES':{
-        visible2 = true;
-
-
+        if(isAesOpen.value == false){
+          visible2 = true;
+          isAesOpen.value = true;
+        }
+        
       }
       default: {
         if(selectedType.value.value == 'Hex' || selectedType.value.value == 'Dec'){
@@ -894,38 +925,29 @@ const isSwapButtonDisabled = computed(() => {
                       </div>
                   </Dialog>
                   <Dialog v-model:visible="visible2" modal header="AES Encryption" :style="{ width: '26rem' }">
-                      <template #header>
-                      </template>
-                      <span class="p-text-secondary block mb-5">Update your information.</span>
+                      <span class="p-text-secondary block mb-5">Enter parameters for encrypting.</span>
                       <div class="flex align-items-center gap-3 mb-3">
-                          <label for="username" class="font-semibold w-6rem">Input</label>
-                          <InputText v-model="aesinput" class="flex-auto" autocomplete="off"/>
-                      </div>
-                      <div class="flex align-items-center gap-3 mb-2">
-                          <label for="email" class="font-semibold w-6rem">Cipher mode</label>
-                          <Dropdown v-model="AESciphermodes" :options="AESciphermode" optionLabel="name" placeholder="Cipher mode" class="w-full md:w-15rem" />
+                          <label for="aesinput" class="font-semibold w-6rem">Input</label>
+                          <InputText id="aesinput" v-model="aesinput" class="flex-auto" autocomplete="off"/>
                       </div>
                       <div id="aes-vector" class="flex align-items-center gap-3 mb-2">
                         <label for="aes-vector" class="font-semibold w-6rem">Vector</label>
-                        <InputText id="aes-vector" class="flex-auto" autocomplete="off" />
+                        <InputText v-model="aesvector" id="aes-vector" class="flex-auto" autocomplete="off" />
 
                     </div>
-                      <div class="flex align-items-center gap-3 mb-2">
-                        <label for="aes-keysize" class="font-semibold w-6rem">Key size in bits</label>
-                        <Dropdown id="aes-keysize" v-model="AESkeysizes" :options="AESkeysize" optionLabel="name" placeholder="Output format" class="w-full md:w-15rem" />
-                    </div>
+
                     <div class="flex align-items-center gap-3 mb-2">
                       <label for="aes-secret" class="font-semibold w-6rem">Secret key</label>
                       <InputText v-model="secretkey" id="aes-secret" class="flex-auto" autocomplete="off" />
                     </div>
                     <div class="flex align-items-center gap-3 mb-2">
-                      <label for="email" class="font-semibold w-6rem">Output text format</label>
-                      <Dropdown v-model="AESformats" :options="AEStextformat" optionLabel="name" placeholder="Output format" class="w-full md:w-15rem" />
+                      <label for="aesformats" class="font-semibold w-6rem">Output text format</label>
+                      <Dropdown id="aesformats" v-model="AESformats" :options="AEStextformat" optionLabel="name" placeholder="Output format" class="w-full md:w-16rem" />
                     </div>
-                      <template #footer>
-                          <Button label="Cancel" text severity="secondary" @click="visible = false" autofocus />
-                          <Button label="Save" outlined severity="secondary" @click="visible = false" autofocus />
-                      </template>
+                    <template #footer>
+                      <Button type="button" label="Cancel" text severity="secondary" @click="visible2 = false" ></Button>
+                      <Button type="button" label="Save" @click="DialogAesGenerate(); isAesOpen = false" ></Button>
+                    </template>
                   </Dialog>
               </div>
             </template>
