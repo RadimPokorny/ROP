@@ -26,6 +26,7 @@ The main purpose of this project will be the ability to put a text string in the
    ```npm install js-md4```
    ```npm install argon2-browser```
    ```npm install buffer```
+   ```npm install --save js-crypto-aes```
 
 3. Open the project (best in Visual Studio Code). Then open the terminal and run this:
 
