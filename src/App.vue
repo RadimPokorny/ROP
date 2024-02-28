@@ -82,7 +82,8 @@ const numberOptions = Array.from({ length: 20 }, (_, index) => (index + 1).toStr
 
 //Dialog for argon2 default
 var visible = ref(false);
-var visible2 = ref(false);
+var aesencryption = ref(false);
+var aesdecryption = ref(false);
 
 //Setup the plain text as default value
 selectedType.value = groupedTypes.value[0].items[0];
@@ -115,7 +116,7 @@ aesvector.value = "";
 
 const getFilteredGroupedTypesForFirstDropdown = computed(() => {
   // Filter the groupedTypes array to include only items with the code 'co'
-  return groupedTypes.value.filter(group => group.code === 'co' || group.code === 'pt');
+  return groupedTypes.value.filter(group => group.code === 'co' || group.code === 'pt' || group.code === 'cr');
 });
 
 const value = ref("");
@@ -218,46 +219,93 @@ async function DialogHashGenerate(this:any): Promise<void>{
   value2.value = result.hashHex;
 }
 
-async function DialogAesGenerate(this: any): Promise<void> {
-
-  if(secretkey.value.length < 16){
+async function DialogAesGenerateEn(this: any): Promise<void> {
+  if (secretkey.value.length != 16) {
     alert('Private key must have 16 characters');
-  }
-  else if(aesvector.value.length < 16){
-    alert('Vector must have 16 characters');
-  }
-  else{
+  } else if (aesvector.value.length != 12) {
+    alert('Vector must have 12 characters');
+  } else {
     const msg = new TextEncoder().encode(aesinput.value);
     const key = new TextEncoder().encode(secretkey.value);
     const iv = new TextEncoder().encode(aesvector.value);
-    const encrypted = await aes.encrypt(msg, key, { name: 'AES-CBC', iv });
+    console.log('Before encryption - msg:', msg, 'key:', key, 'iv:', iv);
+    // Use AES-GCM for encryption
+    const encrypted = await aes.encrypt(msg, key, { name: 'AES-GCM', iv, tagLength: 16 });
+
+    // Convert Uint8Array to a regular array
+    const encryptedArray = Array.from(new Uint8Array(encrypted));
+
     value.value = aesinput.value;
-    if(AESformats.value.value == 'Hex'){
+    if (AESformats.value.value === 'Hex') {
       selectedType2.value = groupedTypes.value[1].items[4];
       value2.value = uint8ArrayToHex(new Uint8Array(encrypted));
-    }
-    else{
+    } else {
       selectedType2.value = groupedTypes.value[1].items[0];
-      value2.value = btoa(String(encrypted));
+      value2.value = btoa(String.fromCharCode.apply(null, encryptedArray));
     }
 
-    visible2 = false;
+    aesencryption.value = false;
   }
 }
 
-//Converts uint8array to hexadecimal value
+function hexToPlainText(hex: string): string {
+  const uint8Array = hexToUint8Array(hex);
+  const textDecoder = new TextDecoder('utf-8'); // nebo jiný kódování podle potřeby
+  return textDecoder.decode(uint8Array);
+}
+
+async function DialogAesGenerateDe(this: any): Promise<void> {
+  if (secretkey.value.length != 16) {
+    alert('Private key must have 16 characters');
+  } else if (aesvector.value.length != 12) {
+    alert('Vector must have 12 characters');
+  } else {    
+
+
+    const data = new TextEncoder().encode(aesinput.value); 
+    const key = new TextEncoder().encode(secretkey.value);
+    const iv = new TextEncoder().encode(aesvector.value);
+    console.log('Before encryption - msg:', data, 'key:', key, 'iv:', iv);
+
+
+
+      const decrypted = await aes.decrypt(data, key, {name: 'AES-GCM', iv});
+
+          // Convert Uint8Array to a regular array
+    const decryptedArray = Array.from(new Uint8Array(decrypted));
+    console.log(decryptedArray);
+
+
+    aesdecryption.value = false;
+  }
+}
+
+
+// Converts uint8array to hexadecimal value
 function uint8ArrayToHex(uint8Array: Uint8Array) {
   return Array.from(uint8Array)
     .map(byte => byte.toString(16).padStart(2, '0'))
     .join('');
 }
 
+function hexToUint8Array(hex: string): Uint8Array {
+  const hexArray = hex.match(/.{1,2}/g);
+  if (!hexArray) {
+    throw new Error('Invalid hexadecimal string');
+  }
+
+  return new Uint8Array(hexArray.map(byte => parseInt(byte, 16)));
+}
+
 
 
 //Checks if AES is once opened
 
-var isAesOpen = ref();
-isAesOpen.value = false;
+var isAesOpenEn = ref();
+isAesOpenEn.value = false;
+
+var isAesOpenDe = ref();
+isAesOpenDe.value = false;
 
 
 function importInput(event: any) {
@@ -583,6 +631,13 @@ async function onChange() {
 
         break;
       }
+      case 'AES':{
+        if(isAesOpenDe.value == false){
+          aesdecryption.value = true;
+          isAesOpenDe.value = true;
+        }
+        break;
+      }
       default: {
         plainText = inputValue;
         break;
@@ -727,11 +782,11 @@ async function onChange() {
         break;
       }
       case 'AES':{
-        if(isAesOpen.value == false){
-          visible2 = true;
-          isAesOpen.value = true;
+        if(isAesOpenEn.value == false){
+          aesencryption.value = true;
+          isAesOpenEn.value = true;
         }
-        
+        break;
       }
       default: {
         if(selectedType.value.value == 'Hex' || selectedType.value.value == 'Dec'){
@@ -924,7 +979,7 @@ const isSwapButtonDisabled = computed(() => {
                           <Button type="button" label="Generate hash" @click="DialogHashGenerate()"></Button>
                       </div>
                   </Dialog>
-                  <Dialog v-model:visible="visible2" modal header="AES Encryption" :style="{ width: '26rem' }">
+                  <Dialog v-model:visible="aesencryption" modal header="AES Encryption" :style="{ width: '26rem' }">
                       <span class="p-text-secondary block mb-5">Enter parameters for encrypting.</span>
                       <div class="flex align-items-center gap-3 mb-3">
                           <label for="aesinput" class="font-semibold w-6rem">Input</label>
@@ -945,8 +1000,33 @@ const isSwapButtonDisabled = computed(() => {
                       <Dropdown id="aesformats" v-model="AESformats" :options="AEStextformat" optionLabel="name" placeholder="Output format" class="w-full md:w-16rem" />
                     </div>
                     <template #footer>
-                      <Button type="button" label="Cancel" text severity="secondary" @click="visible2 = false" ></Button>
-                      <Button type="button" label="Save" @click="DialogAesGenerate(); isAesOpen = false" ></Button>
+                      <Button type="button" label="Cancel" text severity="secondary" @click="aesencryption = false; isAesOpenEn = false" ></Button>
+                      <Button type="button" label="Save" @click="DialogAesGenerateEn(); isAesOpenEn = false" ></Button>
+                    </template>
+                  </Dialog>
+                  <Dialog v-model:visible="aesdecryption" modal header="AES Decryption" :style="{ width: '26rem' }">
+                      <span class="p-text-secondary block mb-5">Enter parameters for decrypting.</span>
+                      <div class="flex align-items-center gap-3 mb-3">
+                          <label for="aesinput" class="font-semibold w-6rem">Input</label>
+                          <InputText id="aesinput" v-model="aesinput" class="flex-auto" autocomplete="off"/>
+                      </div>
+                      <div id="aes-vector" class="flex align-items-center gap-3 mb-2">
+                        <label for="aes-vector" class="font-semibold w-6rem">Vector</label>
+                        <InputText v-model="aesvector" id="aes-vector" class="flex-auto" autocomplete="off" />
+
+                    </div>
+
+                    <div class="flex align-items-center gap-3 mb-2">
+                      <label for="aes-secret" class="font-semibold w-6rem">Secret key</label>
+                      <InputText v-model="secretkey" id="aes-secret" class="flex-auto" autocomplete="off" />
+                    </div>
+                    <div class="flex align-items-center gap-3 mb-2">
+                      <label for="aesformats" class="font-semibold w-6rem">Output text format</label>
+                      <Dropdown id="aesformats" v-model="AESformats" :options="AEStextformat" optionLabel="name" placeholder="Output format" class="w-full md:w-16rem" />
+                    </div>
+                    <template #footer>
+                      <Button type="button" label="Cancel" text severity="secondary" @click="aesdecryption = false; isAesOpenDe = false" ></Button>
+                      <Button type="button" label="Save" @click="DialogAesGenerateDe(); isAesOpenDe = false" ></Button>
                     </template>
                   </Dialog>
               </div>
