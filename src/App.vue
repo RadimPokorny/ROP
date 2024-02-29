@@ -16,6 +16,9 @@ import argon2 from 'argon2-browser/dist/argon2-bundled.min.js';
 
 //Encryption methods
 import aes from 'js-crypto-aes';
+import EncryptRsa from 'encrypt-rsa';
+import NodeRSA from 'node-rsa';
+import * as crypto from "crypto-browserify";
 
 const selectedType = ref();
 const selectedType2 = ref();
@@ -82,8 +85,16 @@ const numberOptions = Array.from({ length: 20 }, (_, index) => (index + 1).toStr
 
 //Dialog for argon2 default
 var visible = ref(false);
+
+//Dialog for AES default
 var aesencryption = ref(false);
 var aesdecryption = ref(false);
+
+//dialog for RSA default
+var rsaencryption = ref(false);
+var rsadecryption = ref(false);
+
+
 
 //Setup the plain text as default value
 selectedType.value = groupedTypes.value[0].items[0];
@@ -112,6 +123,14 @@ const outputtype = ref();
 outputtype.value = "Base64";
 const aesvector = ref();
 aesvector.value = "";
+
+//setup default RSA values
+const rsainput = ref();
+rsainput.value = "";
+const rsapublic = ref();
+rsapublic.value = "";
+const rsaprivate = ref();
+rsaprivate.value = "";
 
 
 const getFilteredGroupedTypesForFirstDropdown = computed(() => {
@@ -248,10 +267,132 @@ async function DialogAesGenerateEn(this: any): Promise<void> {
   }
 }
 
+
+
+
+async function generateRsaKeyPair(): Promise<CryptoKeyPair> {
+  try {
+    const keyPair = await window.crypto.subtle.generateKey(
+      {
+        name: "RSA-OAEP",
+        modulusLength: 2048,
+        publicExponent: new Uint8Array([1, 0, 1]),
+        hash: "SHA-256",
+      },
+      true,
+      ["encrypt", "decrypt"]
+    );
+
+    return keyPair;
+  } catch (error) {
+    console.error("Chyba při generování RSA klíčů:", error);
+    throw error;
+  }
+}
+async function exportKeyInTextForm(key: CryptoKey): Promise<string> {
+  try {
+    if (key.type === 'public') {
+      // Veřejný klíč můžeme exportovat pomocí "spki"
+      const exportedKey = await window.crypto.subtle.exportKey("spki", key);
+      return base64Encode(exportedKey);
+    } else if (key.type === 'private') {
+      // Soukromý klíč můžeme exportovat pomocí "pkcs8"
+      const exportedKey = await window.crypto.subtle.exportKey("pkcs8", key);
+      console.log(exportedKey);
+      return base64Encode(exportedKey);
+    } else {
+      throw new Error('Neznámý typ klíče');
+    }
+  } catch (error) {
+    console.error("Chyba při exportu klíče:", error);
+    throw error;
+  }
+}
+
+// Alternativa k btoa pro kódování binárních dat
+function base64Encode(arrayBuffer: ArrayBuffer): string {
+  const binary = new Uint8Array(arrayBuffer);
+  let base64 = '';
+  for (let i = 0; i < binary.length; i++) {
+    base64 += String.fromCharCode(binary[i]);
+  }
+  return btoa(base64);
+}
+
+async function DialogRsaGenerateEn(this: any): Promise <void> {
+
+  const keyPair = await generateRsaKeyPair();
+  const publicKey = keyPair.publicKey;
+  const pbk = await exportKeyInTextForm(keyPair.publicKey);
+  rsapublic.value = pbk;
+  const privateKey = keyPair.privateKey;
+  const prk = await exportKeyInTextForm(keyPair.privateKey);
+  rsaprivate.value = prk;
+
+  const encodedText = new TextEncoder().encode(String(rsainput.value));
+  const ciphertextBuffer = await window.crypto.subtle.encrypt(
+    {
+      name: "RSA-OAEP",
+    },
+    publicKey,
+    encodedText
+  );
+
+  // Převést zašifrovaný buffer na Base64 řetězec
+  const ciphertextString = arrayBufferToBase64(ciphertextBuffer);
+  console.log(ciphertextString);
+  aesencryption.value = false;
+}
+
+  async function DialogRsaGenerateDe(this: any): Promise <void> {
+
+  const privateKey = rsaprivate.value;
+  const ciphertext = base64Decode(rsainput.value);
+  console.log(privateKey);
+        console.log(ciphertext);
+
+    const decryptedBuffer = await window.crypto.subtle.decrypt(
+        {
+          name: "RSA-OAEP",
+        },
+        privateKey,
+        ciphertext
+      );
+
+        const decryptedText = new TextDecoder().decode(decryptedBuffer);
+      console.log(decryptedText);
+    
+
+  }
+
+// Funkce pro dekódování Base64 řetězce na ArrayBuffer
+function base64Decode(base64String: string): ArrayBuffer {
+  const binaryString = atob(base64String);
+  const length = binaryString.length;
+  const bytes = new Uint8Array(length);
+  for (let i = 0; i < length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
+// Funkce pro převod ArrayBuffer na Base64 řetězec
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const uint8Array = new Uint8Array(buffer);
+  const binaryString = uint8Array.reduce((acc, byte) => acc + String.fromCharCode(byte), '');
+  return btoa(binaryString);
+}
+
 function hexToPlainText(hex: string): string {
   const uint8Array = hexToUint8Array(hex);
   const textDecoder = new TextDecoder('utf-8'); // nebo jiný kódování podle potřeby
   return textDecoder.decode(uint8Array);
+}
+
+// Funkce pro převod ArrayBuffer na řetězec
+function arrayBufferToString(buffer: ArrayBuffer): string {
+  const decoder = new TextDecoder('utf-8');
+  return decoder.decode(buffer);
 }
 
 async function DialogAesGenerateDe(this: any): Promise<void> {
@@ -306,6 +447,16 @@ isAesOpenEn.value = false;
 
 var isAesOpenDe = ref();
 isAesOpenDe.value = false;
+
+//Checks if RSA is once opened
+
+var isRsaOpenEn = ref();
+isRsaOpenEn.value = false;
+
+var isRsaOpenDe = ref();
+isRsaOpenDe.value = false;
+
+
 
 
 function importInput(event: any) {
@@ -638,6 +789,13 @@ async function onChange() {
         }
         break;
       }
+      case 'RSA':{
+        if(isRsaOpenDe.value == false){
+          rsadecryption.value = true;
+          isRsaOpenDe.value = true;
+        }
+        break;
+      }
       default: {
         plainText = inputValue;
         break;
@@ -785,6 +943,13 @@ async function onChange() {
         if(isAesOpenEn.value == false){
           aesencryption.value = true;
           isAesOpenEn.value = true;
+        }
+        break;
+      }
+      case 'RSA':{
+        if(isRsaOpenEn.value == false){
+          rsaencryption.value = true;
+          isRsaOpenEn.value = true;
         }
         break;
       }
@@ -1029,6 +1194,42 @@ const isSwapButtonDisabled = computed(() => {
                       <Button type="button" label="Save" @click="DialogAesGenerateDe(); isAesOpenDe = false" ></Button>
                     </template>
                   </Dialog>
+                  <Dialog v-model:visible="rsaencryption" modal header="RSA Encryption" :style="{ width: '26rem' }">
+                    <span class="p-text-secondary block mb-5">Enter parameters for encrypting.</span>
+                    <div class="flex align-items-center gap-3 mb-3">
+                        <label for="rsainput" class="font-semibold w-6rem">Input</label>
+                        <InputText id="rsainput" v-model="rsainput" class="flex-auto" autocomplete="off"/>
+                    </div>
+                    <div id="aes-vector" class="flex align-items-center gap-3 mb-2">
+                      <label for="rsa-public" class="font-semibold w-6rem">Public key</label>
+                      <InputText v-model="rsapublic" id="aes-public" class="flex-auto" autocomplete="off" />
+
+                  </div>
+
+                  <div class="flex align-items-center gap-3 mb-2">
+                    <label for="rsa-private" class="font-semibold w-6rem">Private key</label>
+                    <InputText v-model="rsaprivate" id="rsa-private" class="flex-auto" autocomplete="off" />
+                  </div>
+                  <template #footer>
+                    <Button type="button" label="Cancel" text severity="secondary" @click="rsaencryption = false; isAesOpenDe = false" ></Button>
+                    <Button type="button" label="Save" @click="DialogRsaGenerateEn(); isRsaOpenEn = false" ></Button>
+                  </template>
+                </Dialog>
+                <Dialog v-model:visible="rsadecryption" modal header="RSA Decryption" :style="{ width: '26rem' }">
+                  <span class="p-text-secondary block mb-5">Enter parameters for decrypting.</span>
+                  <div class="flex align-items-center gap-3 mb-3">
+                      <label for="rsainput" class="font-semibold w-6rem">Input</label>
+                      <InputText id="rsainput" v-model="rsainput" class="flex-auto" autocomplete="off"/>
+                  </div>
+                <div class="flex align-items-center gap-3 mb-2">
+                  <label for="rsa-private" class="font-semibold w-6rem">Private key</label>
+                  <InputText v-model="rsaprivate" id="rsa-private" class="flex-auto" autocomplete="off" />
+                </div>
+                <template #footer>
+                  <Button type="button" label="Cancel" text severity="secondary" @click="rsadecryption = false; isAesOpenDe = false" ></Button>
+                  <Button type="button" label="Save" @click="DialogRsaGenerateDe(); isRsaOpenDe = false" ></Button>
+                </template>
+              </Dialog>
               </div>
             </template>
             <div class="button">
