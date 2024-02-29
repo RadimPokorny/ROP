@@ -28,6 +28,7 @@
     "crc-32": "^1.2.2",
     "crypto-js": "^4.2.0",
     "des.js": "^1.1.0",
+    "encrypt-rsa": "^2.1.5",
     "file-saver": "^2.0.5",
     "html-entities": "^2.4.0",
     "httpntlm": "^1.8.13",
