@@ -382,6 +382,17 @@ async function DialogRcGenerateEn(this:any, dynamicKey: string ): Promise <void>
 
 }
 
+async function DialogRcGenerateDe(this:any): Promise <void>{
+
+const pastedKey = rcprivate.value;
+const decrypted = CryptoJS.RC4.decrypt(value.value, pastedKey);
+const decryptedText = decrypted.toString(CryptoJS.enc.Utf8);
+value2.value = decryptedText;
+rcdecryption.value = false;
+
+
+}
+
 //generate key for RC
 
 function generateRandomKey(length: number): string {
@@ -834,6 +845,13 @@ async function onChange() {
         }
         break;
       }
+      case 'RC':{
+        if(isRcOpenDe.value == false){
+          rcdecryption.value = true;
+          isRcOpenDe.value = true;
+        }
+        break;
+      }
       default: {
         plainText = inputValue;
         break;
@@ -1279,6 +1297,21 @@ const isSwapButtonDisabled = computed(() => {
               <template #footer>
                 <Button type="button" label="Cancel" text severity="secondary" @click="rcencryption = false; isRcOpenEn = false" ></Button>
                 <Button type="button" label="Save" @click="DialogRcGenerateEn(generateRandomKey(16)); isRcOpenEn = false" ></Button>
+              </template>
+            </Dialog>
+            <Dialog v-model:visible="rcdecryption" modal header="RC Encryption" :style="{ width: '26rem' }">
+                <span class="p-text-secondary block mb-5">Enter parameters for decrypting.</span>
+                <div class="flex align-items-center gap-3 mb-3">
+                    <label for="rcinput" class="font-semibold w-6rem">Input</label>
+                    <InputText id="rcinput" v-model="value" class="flex-auto" autocomplete="off"/>
+                </div>
+              <div class="flex align-items-center gap-3 mb-2">
+                <label for="rc-secret" class="font-semibold w-6rem">Secret key</label>
+                <InputText v-model="rcprivate" id="rc-secret" class="flex-auto" autocomplete="off" />
+              </div>
+              <template #footer>
+                <Button type="button" label="Cancel" text severity="secondary" @click="rcdecryption = false; isRcOpenDe = false" ></Button>
+                <Button type="button" label="Save" @click="DialogRcGenerateDe(); isRcOpenDe = false" ></Button>
               </template>
             </Dialog>
               </div>
