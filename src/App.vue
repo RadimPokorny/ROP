@@ -19,7 +19,6 @@ import aes from 'js-crypto-aes';
 import EncryptRsa from 'encrypt-rsa';
 import NodeRSA from 'node-rsa';
 import * as crypto from "crypto-browserify";
-import * as RC4 from "rc";
 import * as CryptoJS from 'crypto-js';
 
 const selectedType = ref();
