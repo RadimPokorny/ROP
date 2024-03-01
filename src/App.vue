@@ -1,4 +1,6 @@
 <script setup lang="ts">
+
+//Coding and general methods
 import { ref, computed} from "vue";
 import {encode} from 'html-entities';
 import {decode} from 'html-entities';
@@ -21,6 +23,8 @@ import NodeRSA from 'node-rsa';
 import * as crypto from "crypto-browserify";
 import * as CryptoJS from 'crypto-js';
 
+
+//Object with all methods for dropdowns and references in the code
 const selectedType = ref();
 const selectedType2 = ref();
 const groupedTypes = ref([
@@ -159,6 +163,8 @@ const getFilteredGroupedTypesForFirstDropdown = computed(() => {
   return groupedTypes.value.filter(group => group.code === 'co' || group.code === 'pt' || group.code === 'cr');
 });
 
+
+//Initialize the input and output
 const value = ref("");
 const value2 = ref("");
 var inputvalue = ref();
@@ -179,6 +185,8 @@ function swapValue(): void {
   
 }
 
+
+//Show salt if the chosen method is Bcrypt
 function showSalt(): void {
   var saltElm: HTMLElement | null = document.getElementById('btn-drop');
   var saltElm2: HTMLElement | null = document.getElementById('btn-argon');
@@ -196,11 +204,11 @@ function showSalt(): void {
   }
 }
 
-
-
+//Variables for checking if input or output is copied
 const isCopied = ref(false);
 const isCopied2 = ref(false);
 
+//Copy input
 function copyValue(): void {
   if (value.value) {
     navigator.clipboard.writeText(value.value);
@@ -215,6 +223,7 @@ function copyValue(): void {
   }
 }
 
+//Copy output
 function copyValue2(): void {
   if (value2.value) {
     navigator.clipboard.writeText(value2.value);
@@ -232,7 +241,7 @@ function copyValue2(): void {
 //Generate salt for the Argon2
 function generateSalt(): String {
   var buffer = new Uint8Array(16); // 128 bits
-  const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'; //Chracters list
+  const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'; //Characters list
   let randomString = '';
 
   for (let i = 0; i < buffer.length; i++) {
@@ -259,6 +268,7 @@ async function DialogHashGenerate(this:any): Promise<void>{
   value2.value = result.hashHex;
 }
 
+//Generate AES encrypted string
 async function DialogAesGenerateEn(this: any): Promise<void> {
   if (secretkey.value.length != 16) {
     alert('Private key must have 16 characters');
@@ -288,9 +298,7 @@ async function DialogAesGenerateEn(this: any): Promise<void> {
   }
 }
 
-
-
-
+//Generate private and public key for AES encryption
 async function generateRsaKeyPair(): Promise<CryptoKeyPair> {
   try {
     const keyPair = await window.crypto.subtle.generateKey(
@@ -306,10 +314,12 @@ async function generateRsaKeyPair(): Promise<CryptoKeyPair> {
 
     return keyPair;
   } catch (error) {
-    console.error("Chyba při generování RSA klíčů:", error);
+    console.error("Error while generating the AES keys", error);
     throw error;
   }
 }
+
+//Get string from the keys
 async function exportKeyInTextForm(key: CryptoKey): Promise<string> {
   try {
     if (key.type === 'public') {
@@ -321,15 +331,15 @@ async function exportKeyInTextForm(key: CryptoKey): Promise<string> {
       const exportedKey = await window.crypto.subtle.exportKey("pkcs8", key);
       return base64Encode(exportedKey);
     } else {
-      throw new Error('Neznámý typ klíče');
+      throw new Error('Unknown key type: ' + key.type);
     }
   } catch (error) {
-    console.error("Chyba při exportu klíče:", error);
+    console.error("Error while exporting:", error);
     throw error;
   }
 }
 
-// Alternativa k btoa pro kódování binárních dat
+//Encode to base64
 function base64Encode(arrayBuffer: ArrayBuffer): string {
   const binary = new Uint8Array(arrayBuffer);
   let base64 = '';
@@ -339,6 +349,7 @@ function base64Encode(arrayBuffer: ArrayBuffer): string {
   return btoa(base64);
 }
 
+//Generate RSA encrypted output
 async function DialogRsaGenerateEn(this: any): Promise <void> {
 
   const rsainput: string = value.value;
@@ -359,28 +370,28 @@ async function DialogRsaGenerateEn(this: any): Promise <void> {
     encodedText
   );
 
-  // Převést zašifrovaný buffer na Base64 řetězec
+  //Convert encrypted buffer to Base64 string
   const ciphertextString = arrayBufferToBase64(ciphertextBuffer);
   selectedType2.value = groupedTypes.value[1].items[0];
   value2.value = ciphertextString;
   aesencryption.value = false;
 }
 
-  async function DialogRsaGenerateDe(this: any): Promise <void> {
+//Decrypt RSA string
+async function DialogRsaGenerateDe(this: any): Promise <void> {
 
   const privateKey = rsaprivate.value;
   const ciphertext = base64Decode(value.value);
 
     const decryptedBuffer = await window.crypto.subtle.decrypt(
-        {
-          name: "RSA-OAEP",
-        },
-        privateKey,
-        ciphertext
-      );
+      {
+        name: "RSA-OAEP",
+      },
+      privateKey,
+      ciphertext
+    );
 
-        const decryptedText = new TextDecoder().decode(decryptedBuffer);
-    
+  const decryptedText = new TextDecoder().decode(decryptedBuffer);
 
 }
 
@@ -389,6 +400,7 @@ async function DialogRcGenerateEn(this:any, dynamicKey: string ): Promise <void>
   rcprivate.value = dynamicKey;
   const encrypted = CryptoJS.RC4.encrypt(value.value, dynamicKey);
   value2.value = encrypted.toString();
+  selectedType2.value = groupedTypes.value[1].items[0];
 }
 
 //Decrypt encrypted string
@@ -396,24 +408,29 @@ async function DialogRcGenerateDe(this:any): Promise <void>{
   const pastedKey = rcprivate.value;
   const decrypted = CryptoJS.RC4.decrypt(value.value, pastedKey);
   const decryptedText = decrypted.toString(CryptoJS.enc.Utf8);
+  selectedType.value = groupedTypes.value[0].items[0];
   value2.value = decryptedText;
   rcdecryption.value = false;
 }
 
+
+//Encrypt string to the DES base64 output
 async function DialogDesGenerateEn(this:any): Promise <void>{
   const encryptedData = CryptoJS.DES.encrypt(value.value, desprivate.value).toString();
   value2.value = encryptedData;
   desencryption.value = false;
+  selectedType2.value = groupedTypes.value[1].items[0];
 }
 
+//Decrypt AES string to the plaintext output
 async function DialogDesGenerateDe(this:any): Promise <void>{
   const decryptedData = CryptoJS.DES.decrypt(value.value, desprivate.value).toString(CryptoJS.enc.Utf8);
   value2.value = decryptedData;
+  selectedType.value = groupedTypes.value[0].items[0];
   desdecryption.value = false;
 }
 
-//generate key for RC
-
+//generate a key for RC and DES
 function generateRandomKey(length: number): string {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let randomKey = '';
@@ -425,7 +442,7 @@ function generateRandomKey(length: number): string {
 }
 
 
-// Funkce pro dekódování Base64 řetězce na ArrayBuffer
+//Decode Base64 to ArrayBuffer
 function base64Decode(base64String: string): ArrayBuffer {
   const binaryString = atob(base64String);
   const length = binaryString.length;
@@ -436,59 +453,53 @@ function base64Decode(base64String: string): ArrayBuffer {
   return bytes.buffer;
 }
 
-// Funkce pro převod ArrayBuffer na Base64 řetězec
+//ArrayBuffer to Base64
 function arrayBufferToBase64(buffer: ArrayBuffer): string {
   const uint8Array = new Uint8Array(buffer);
   const binaryString = uint8Array.reduce((acc, byte) => acc + String.fromCharCode(byte), '');
   return btoa(binaryString);
 }
 
+//Convert hex string to plaintext
 function hexToPlainText(hex: string): string {
   const uint8Array = hexToUint8Array(hex);
   const textDecoder = new TextDecoder('utf-8'); // nebo jiný kódování podle potřeby
   return textDecoder.decode(uint8Array);
 }
 
-// Funkce pro převod ArrayBuffer na řetězec
+//ArrayBuffer to string
 function arrayBufferToString(buffer: ArrayBuffer): string {
   const decoder = new TextDecoder('utf-8');
   return decoder.decode(buffer);
 }
 
+//Decrypt AES input
 async function DialogAesGenerateDe(this: any): Promise<void> {
   if (secretkey.value.length != 16) {
     alert('Private key must have 16 characters');
   } else if (aesvector.value.length != 12) {
     alert('Vector must have 12 characters');
   } else {    
-
-
     const data = new TextEncoder().encode(aesinput.value); 
     const key = new TextEncoder().encode(secretkey.value);
     const iv = new TextEncoder().encode(aesvector.value);
     console.log('Before encryption - msg:', data, 'key:', key, 'iv:', iv);
-
-
-
-      const decrypted = await aes.decrypt(data, key, {name: 'AES-GCM', iv});
-
-          // Convert Uint8Array to a regular array
+    const decrypted = await aes.decrypt(data, key, {name: 'AES-GCM', iv});
+    // Convert Uint8Array to a regular array
     const decryptedArray = Array.from(new Uint8Array(decrypted));
     console.log(decryptedArray);
-
-
     aesdecryption.value = false;
   }
 }
 
-
-// Converts uint8array to hexadecimal value
+//Converts uint8array to hexadecimal value
 function uint8ArrayToHex(uint8Array: Uint8Array) {
   return Array.from(uint8Array)
     .map(byte => byte.toString(16).padStart(2, '0'))
     .join('');
 }
 
+//Hexadecimal to Uint8Array
 function hexToUint8Array(hex: string): Uint8Array {
   const hexArray = hex.match(/.{1,2}/g);
   if (!hexArray) {
@@ -501,7 +512,6 @@ function hexToUint8Array(hex: string): Uint8Array {
 
 
 //Checks if AES is once opened
-
 var isAesOpenEn = ref();
 isAesOpenEn.value = false;
 
@@ -532,9 +542,7 @@ isDesOpenEn.value = false;
 var isDesOpenDe = ref();
 isDesOpenDe.value = false;
 
-
-
-
+//Gets the file content for value.value
 function importInput(event: any) {
   const fileInput = event.target;
   const file = fileInput.files[0];
@@ -557,7 +565,7 @@ function importInput(event: any) {
   }
 }
 
-
+//Exports the file with value2.value
 function exportOutput() {
   if (value2.value) {
     const blob = new Blob([value2.value], { type: 'text/plain;charset=utf-8' });
@@ -576,6 +584,7 @@ function resetComps(): void {
   showSalt();
 }
 
+//Trim input (output does not have to be trimmed)
 function trimInput(): void {
   value.value = value.value.trim();
 }
@@ -629,6 +638,7 @@ function BinToPlain(binaryString: string): string {
   return plainText;
 }
 
+//Create LM hashed string
 function create_LM_hashed_password_v1(password: string): Buffer {
   // 14 bytes password conversion
   password = password.toUpperCase();
@@ -658,6 +668,8 @@ function create_LM_hashed_password_v1(password: string): Buffer {
   return Buffer.concat([firstPartEncrypted, secondPartEncrypted]);
 }
 
+
+//Function for LM and NT hash (Do not edit)
 function bytes2binaryArray(buf: Buffer): number[] {
   const hex2binary: Record<string, number[]> = {
     '0': [0, 0, 0, 0],
@@ -688,6 +700,7 @@ function bytes2binaryArray(buf: Buffer): number[] {
   return array;
 }
 
+//Function for LM and NT hash (Do not edit)
 function binaryArray2bytes(array: string): Buffer {
   const binary2hex: Record<string, number | string> = {
     '0000': 0,
@@ -726,6 +739,7 @@ function binaryArray2bytes(array: string): Buffer {
   return Buffer.concat(bufArray);
 }
 
+//Function for LM and NT hash (Do not edit)
 function insertZerosEvery7Bits(buf: Buffer): Buffer {
   const binaryArray: number[] = bytes2binaryArray(buf);
   const newBinaryArray: number[] = [];
@@ -741,6 +755,7 @@ function insertZerosEvery7Bits(buf: Buffer): Buffer {
   return binaryArray2bytes(newBinaryArray.join(''));
 }
 
+//Generate NT hash
 function create_NT_hashed_password_v1(password: String){
 	var buf = Buffer.from(password, 'utf16le');
 	var md4 = create();
@@ -748,8 +763,8 @@ function create_NT_hashed_password_v1(password: String){
 	return Buffer.from(md4.digest());
 }
 
+//Function for additional functions. Basically cheking textarea everytime when action
 function areaCheck() {
-
   //Automatically adding space between ASCII values
   if(selectedType.value.value == 'ASCII'){
     if(value.value.length >= 3){
@@ -761,6 +776,7 @@ function areaCheck() {
   }
 }
 
+//Do when dropdown value is selected
 async function onChange() {
   let inputValue = (value.value).toString();
   let plainText = "";
@@ -1232,8 +1248,8 @@ const isSwapButtonDisabled = computed(() => {
                           <InputText v-model="argonpar" id="parallelismfactor" class="flex-auto" autocomplete="off" />
                       </div>
                       <div class="flex align-items-center gap-3 mb-5">
-                          <label for="nemorycost" class="font-semibold w-6rem">Memory Cost</label>
-                          <InputText v-model="argonmem" id="nemorycost" class="flex-auto" autocomplete="off" />
+                          <label for="memorycost" class="font-semibold w-6rem">Memory Cost</label>
+                          <InputText v-model="argonmem" id="memorycost" class="flex-auto" autocomplete="off" />
                       </div>
                       <div class="flex align-items-center gap-3 mb-5">
                           <label for="iterations" class="font-semibold w-6rem">Iterations</label>
@@ -1300,7 +1316,7 @@ const isSwapButtonDisabled = computed(() => {
                     <span class="p-text-secondary block mb-5">Enter parameters for encrypting. Press button save for new keys and output</span>
                     <div id="aes-vector" class="flex align-items-center gap-3 mb-2">
                       <label for="rsa-public" class="font-semibold w-6rem">Public key</label>
-                      <InputText v-model="rsapublic" id="aes-public" class="flex-auto" autocomplete="off" />
+                      <InputText v-model="rsapublic" id="rsa-public" class="flex-auto" autocomplete="off" />
                     </div>
                   <div class="flex align-items-center gap-3 mb-2">
                     <label for="rsa-private" class="font-semibold w-6rem">Private key</label>
@@ -1359,7 +1375,7 @@ const isSwapButtonDisabled = computed(() => {
             <Dialog v-model:visible="desencryption" modal header="DES Encryption" :style="{ width: '26rem' }">
                 <span class="p-text-secondary block mb-5">Enter parameters for encrypting.</span>
                 <div class="flex align-items-center gap-3 mb-3">
-                    <label for="rcinput" class="font-semibold w-6rem">Input</label>
+                    <label for="desinput" class="font-semibold w-6rem">Input</label>
                     <InputText id="desinput" v-model="value" class="flex-auto" autocomplete="off"/>
                 </div>
               <div class="flex align-items-center gap-3 mb-2">
@@ -1374,7 +1390,7 @@ const isSwapButtonDisabled = computed(() => {
             <Dialog v-model:visible="desdecryption" modal header="DES Decryption" :style="{ width: '26rem' }">
                 <span class="p-text-secondary block mb-5">Enter parameters for decrypting.</span>
                 <div class="flex align-items-center gap-3 mb-3">
-                    <label for="rcinput" class="font-semibold w-6rem">Input</label>
+                    <label for="desinput" class="font-semibold w-6rem">Input</label>
                     <InputText id="desinput" v-model="value" class="flex-auto" autocomplete="off"/>
                 </div>
               <div class="flex align-items-center gap-3 mb-2">
