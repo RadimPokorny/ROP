@@ -99,6 +99,10 @@ var rsadecryption = ref(false);
 var rcencryption = ref(false);
 var rcdecryption = ref(false);
 
+//dialog for DES default
+var desencryption = ref(false);
+var desdecryption = ref(false);
+
 
 
 //Setup the plain text as default value
@@ -142,6 +146,12 @@ const rcinput = ref();
 rsainput.value = "";
 const rcprivate = ref();
 rsaprivate.value = "";
+
+//setup default AES values
+const desinput = ref();
+desinput.value = "";
+const desprivate = ref();
+desprivate.value = "";
 
 
 const getFilteredGroupedTypesForFirstDropdown = computed(() => {
@@ -374,23 +384,32 @@ async function DialogRsaGenerateEn(this: any): Promise <void> {
 
 }
 
+//Generage encrypted string
 async function DialogRcGenerateEn(this:any, dynamicKey: string ): Promise <void>{
-
   rcprivate.value = dynamicKey;
   const encrypted = CryptoJS.RC4.encrypt(value.value, dynamicKey);
   value2.value = encrypted.toString();
-
 }
 
+//Decrypt encrypted string
 async function DialogRcGenerateDe(this:any): Promise <void>{
+  const pastedKey = rcprivate.value;
+  const decrypted = CryptoJS.RC4.decrypt(value.value, pastedKey);
+  const decryptedText = decrypted.toString(CryptoJS.enc.Utf8);
+  value2.value = decryptedText;
+  rcdecryption.value = false;
+}
 
-const pastedKey = rcprivate.value;
-const decrypted = CryptoJS.RC4.decrypt(value.value, pastedKey);
-const decryptedText = decrypted.toString(CryptoJS.enc.Utf8);
-value2.value = decryptedText;
-rcdecryption.value = false;
+async function DialogDesGenerateEn(this:any): Promise <void>{
+  const encryptedData = CryptoJS.DES.encrypt(value.value, desprivate.value).toString();
+  value2.value = encryptedData;
+  desencryption.value = false;
+}
 
-
+async function DialogDesGenerateDe(this:any): Promise <void>{
+  const decryptedData = CryptoJS.DES.decrypt(value.value, desprivate.value).toString(CryptoJS.enc.Utf8);
+  value2.value = decryptedData;
+  desdecryption.value = false;
 }
 
 //generate key for RC
@@ -504,6 +523,14 @@ isRcOpenEn.value = false;
 
 var isRcOpenDe = ref();
 isRcOpenDe.value = false;
+
+//checks if AES is once opened
+
+var isDesOpenEn = ref();
+isDesOpenEn.value = false;
+
+var isDesOpenDe = ref();
+isDesOpenDe.value = false;
 
 
 
@@ -852,6 +879,13 @@ async function onChange() {
         }
         break;
       }
+      case 'DES':{
+        if(isDesOpenDe.value == false){
+          desdecryption.value = true;
+          isDesOpenDe.value = true;
+        }
+        break;
+      }
       default: {
         plainText = inputValue;
         break;
@@ -1012,6 +1046,14 @@ async function onChange() {
         if(isRcOpenEn.value == false){
           rcencryption.value = true;
           isRcOpenEn.value = true;
+        }
+        break;
+      }
+      case 'DES':{
+        desprivate.value = generateRandomKey(16);
+        if(isDesOpenEn.value == false){
+          desencryption.value = true;
+          isDesOpenEn.value = true;
         }
         break;
       }
@@ -1299,7 +1341,7 @@ const isSwapButtonDisabled = computed(() => {
                 <Button type="button" label="Save" @click="DialogRcGenerateEn(generateRandomKey(16)); isRcOpenEn = false" ></Button>
               </template>
             </Dialog>
-            <Dialog v-model:visible="rcdecryption" modal header="RC Encryption" :style="{ width: '26rem' }">
+            <Dialog v-model:visible="rcdecryption" modal header="RC Decryption" :style="{ width: '26rem' }">
                 <span class="p-text-secondary block mb-5">Enter parameters for decrypting.</span>
                 <div class="flex align-items-center gap-3 mb-3">
                     <label for="rcinput" class="font-semibold w-6rem">Input</label>
@@ -1312,6 +1354,36 @@ const isSwapButtonDisabled = computed(() => {
               <template #footer>
                 <Button type="button" label="Cancel" text severity="secondary" @click="rcdecryption = false; isRcOpenDe = false" ></Button>
                 <Button type="button" label="Save" @click="DialogRcGenerateDe(); isRcOpenDe = false" ></Button>
+              </template>
+            </Dialog>
+            <Dialog v-model:visible="desencryption" modal header="DES Encryption" :style="{ width: '26rem' }">
+                <span class="p-text-secondary block mb-5">Enter parameters for encrypting.</span>
+                <div class="flex align-items-center gap-3 mb-3">
+                    <label for="rcinput" class="font-semibold w-6rem">Input</label>
+                    <InputText id="desinput" v-model="value" class="flex-auto" autocomplete="off"/>
+                </div>
+              <div class="flex align-items-center gap-3 mb-2">
+                <label for="des-secret" class="font-semibold w-6rem">Secret key</label>
+                <InputText v-model="desprivate" id="des-secret" class="flex-auto" autocomplete="off" />
+              </div>
+              <template #footer>
+                <Button type="button" label="Cancel" text severity="secondary" @click="desencryption = false; isDesOpenEn = false" ></Button>
+                <Button type="button" label="Save" @click="DialogDesGenerateEn(); isDesOpenEn = false" ></Button>
+              </template>
+            </Dialog>
+            <Dialog v-model:visible="desdecryption" modal header="DES Decryption" :style="{ width: '26rem' }">
+                <span class="p-text-secondary block mb-5">Enter parameters for decrypting.</span>
+                <div class="flex align-items-center gap-3 mb-3">
+                    <label for="rcinput" class="font-semibold w-6rem">Input</label>
+                    <InputText id="desinput" v-model="value" class="flex-auto" autocomplete="off"/>
+                </div>
+              <div class="flex align-items-center gap-3 mb-2">
+                <label for="des-secret" class="font-semibold w-6rem">Secret key</label>
+                <InputText v-model="desprivate" id="des-secret" class="flex-auto" autocomplete="off" />
+              </div>
+              <template #footer>
+                <Button type="button" label="Cancel" text severity="secondary" @click="desdecryption = false; isDesOpenDe = false" ></Button>
+                <Button type="button" label="Save" @click="DialogDesGenerateDe(); isDesOpenDe = false" ></Button>
               </template>
             </Dialog>
               </div>
