@@ -19,6 +19,8 @@ import aes from 'js-crypto-aes';
 import EncryptRsa from 'encrypt-rsa';
 import NodeRSA from 'node-rsa';
 import * as crypto from "crypto-browserify";
+import * as RC4 from "rc";
+import * as CryptoJS from 'crypto-js';
 
 const selectedType = ref();
 const selectedType2 = ref();
@@ -94,6 +96,10 @@ var aesdecryption = ref(false);
 var rsaencryption = ref(false);
 var rsadecryption = ref(false);
 
+//dialog for RC default
+var rcencryption = ref(false);
+var rcdecryption = ref(false);
+
 
 
 //Setup the plain text as default value
@@ -130,6 +136,12 @@ rsainput.value = "";
 const rsapublic = ref();
 rsapublic.value = "";
 const rsaprivate = ref();
+rsaprivate.value = "";
+
+//setup default RC values
+const rcinput = ref();
+rsainput.value = "";
+const rcprivate = ref();
 rsaprivate.value = "";
 
 
@@ -298,7 +310,6 @@ async function exportKeyInTextForm(key: CryptoKey): Promise<string> {
     } else if (key.type === 'private') {
       // Soukromý klíč můžeme exportovat pomocí "pkcs8"
       const exportedKey = await window.crypto.subtle.exportKey("pkcs8", key);
-      console.log(exportedKey);
       return base64Encode(exportedKey);
     } else {
       throw new Error('Neznámý typ klíče');
@@ -321,6 +332,7 @@ function base64Encode(arrayBuffer: ArrayBuffer): string {
 
 async function DialogRsaGenerateEn(this: any): Promise <void> {
 
+  const rsainput: string = value.value;
   const keyPair = await generateRsaKeyPair();
   const publicKey = keyPair.publicKey;
   const pbk = await exportKeyInTextForm(keyPair.publicKey);
@@ -329,7 +341,7 @@ async function DialogRsaGenerateEn(this: any): Promise <void> {
   const prk = await exportKeyInTextForm(keyPair.privateKey);
   rsaprivate.value = prk;
 
-  const encodedText = new TextEncoder().encode(String(rsainput.value));
+  const encodedText = new TextEncoder().encode(rsainput);
   const ciphertextBuffer = await window.crypto.subtle.encrypt(
     {
       name: "RSA-OAEP",
@@ -340,16 +352,15 @@ async function DialogRsaGenerateEn(this: any): Promise <void> {
 
   // Převést zašifrovaný buffer na Base64 řetězec
   const ciphertextString = arrayBufferToBase64(ciphertextBuffer);
-  console.log(ciphertextString);
+  selectedType2.value = groupedTypes.value[1].items[0];
+  value2.value = ciphertextString;
   aesencryption.value = false;
 }
 
   async function DialogRsaGenerateDe(this: any): Promise <void> {
 
   const privateKey = rsaprivate.value;
-  const ciphertext = base64Decode(rsainput.value);
-  console.log(privateKey);
-        console.log(ciphertext);
+  const ciphertext = base64Decode(value.value);
 
     const decryptedBuffer = await window.crypto.subtle.decrypt(
         {
@@ -360,10 +371,30 @@ async function DialogRsaGenerateEn(this: any): Promise <void> {
       );
 
         const decryptedText = new TextDecoder().decode(decryptedBuffer);
-      console.log(decryptedText);
     
 
-  }
+}
+
+async function DialogRcGenerateEn(this:any, dynamicKey: string ): Promise <void>{
+
+  rcprivate.value = dynamicKey;
+  const encrypted = CryptoJS.RC4.encrypt(value.value, dynamicKey);
+  value2.value = encrypted.toString();
+
+}
+
+//generate key for RC
+
+function generateRandomKey(length: number): string {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let randomKey = '';
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        randomKey += characters.charAt(randomIndex);
+    }
+    return randomKey;
+}
+
 
 // Funkce pro dekódování Base64 řetězce na ArrayBuffer
 function base64Decode(base64String: string): ArrayBuffer {
@@ -455,6 +486,14 @@ isRsaOpenEn.value = false;
 
 var isRsaOpenDe = ref();
 isRsaOpenDe.value = false;
+
+//Checks if RC is once opened
+
+var isRcOpenEn = ref();
+isRcOpenEn.value = false;
+
+var isRcOpenDe = ref();
+isRcOpenDe.value = false;
 
 
 
@@ -935,7 +974,6 @@ async function onChange() {
           parallelism: argonpar.value,
           type: argon2.ArgonType.Argon2d,
         });
-
         value2.value = result.hashHex;
         break;
       }
@@ -950,6 +988,13 @@ async function onChange() {
         if(isRsaOpenEn.value == false){
           rsaencryption.value = true;
           isRsaOpenEn.value = true;
+        }
+        break;
+      }
+      case 'RC':{
+        if(isRcOpenEn.value == false){
+          rcencryption.value = true;
+          isRcOpenEn.value = true;
         }
         break;
       }
@@ -1153,9 +1198,7 @@ const isSwapButtonDisabled = computed(() => {
                       <div id="aes-vector" class="flex align-items-center gap-3 mb-2">
                         <label for="aes-vector" class="font-semibold w-6rem">Vector</label>
                         <InputText v-model="aesvector" id="aes-vector" class="flex-auto" autocomplete="off" />
-
-                    </div>
-
+                      </div>
                     <div class="flex align-items-center gap-3 mb-2">
                       <label for="aes-secret" class="font-semibold w-6rem">Secret key</label>
                       <InputText v-model="secretkey" id="aes-secret" class="flex-auto" autocomplete="off" />
@@ -1195,24 +1238,18 @@ const isSwapButtonDisabled = computed(() => {
                     </template>
                   </Dialog>
                   <Dialog v-model:visible="rsaencryption" modal header="RSA Encryption" :style="{ width: '26rem' }">
-                    <span class="p-text-secondary block mb-5">Enter parameters for encrypting.</span>
-                    <div class="flex align-items-center gap-3 mb-3">
-                        <label for="rsainput" class="font-semibold w-6rem">Input</label>
-                        <InputText id="rsainput" v-model="rsainput" class="flex-auto" autocomplete="off"/>
-                    </div>
+                    <span class="p-text-secondary block mb-5">Enter parameters for encrypting. Press button save for new keys and output</span>
                     <div id="aes-vector" class="flex align-items-center gap-3 mb-2">
                       <label for="rsa-public" class="font-semibold w-6rem">Public key</label>
                       <InputText v-model="rsapublic" id="aes-public" class="flex-auto" autocomplete="off" />
-
-                  </div>
-
+                    </div>
                   <div class="flex align-items-center gap-3 mb-2">
                     <label for="rsa-private" class="font-semibold w-6rem">Private key</label>
                     <InputText v-model="rsaprivate" id="rsa-private" class="flex-auto" autocomplete="off" />
                   </div>
                   <template #footer>
                     <Button type="button" label="Cancel" text severity="secondary" @click="rsaencryption = false; isAesOpenDe = false" ></Button>
-                    <Button type="button" label="Save" @click="DialogRsaGenerateEn(); isRsaOpenEn = false" ></Button>
+                    <Button type="button" label="Save" @click="DialogRsaGenerateEn(); isRsaOpenEn = false;" ></Button>
                   </template>
                 </Dialog>
                 <Dialog v-model:visible="rsadecryption" modal header="RSA Decryption" :style="{ width: '26rem' }">
@@ -1230,6 +1267,21 @@ const isSwapButtonDisabled = computed(() => {
                   <Button type="button" label="Save" @click="DialogRsaGenerateDe(); isRsaOpenDe = false" ></Button>
                 </template>
               </Dialog>
+              <Dialog v-model:visible="rcencryption" modal header="RC Encryption" :style="{ width: '26rem' }">
+                <span class="p-text-secondary block mb-5">Enter parameters for encrypting. Press button save for new key and output</span>
+                <div class="flex align-items-center gap-3 mb-3">
+                    <label for="rcinput" class="font-semibold w-6rem">Input</label>
+                    <InputText id="rcinput" v-model="value" class="flex-auto" autocomplete="off"/>
+                </div>
+              <div class="flex align-items-center gap-3 mb-2">
+                <label for="rc-secret" class="font-semibold w-6rem">Secret key</label>
+                <InputText v-model="rcprivate" id="rc-secret" class="flex-auto" autocomplete="off" />
+              </div>
+              <template #footer>
+                <Button type="button" label="Cancel" text severity="secondary" @click="rcencryption = false; isRcOpenEn = false" ></Button>
+                <Button type="button" label="Save" @click="DialogRcGenerateEn(generateRandomKey(16)); isRcOpenEn = false" ></Button>
+              </template>
+            </Dialog>
               </div>
             </template>
             <div class="button">
