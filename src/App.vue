@@ -5,7 +5,7 @@ import { ref, computed} from "vue";
 import {encode} from 'html-entities';
 import {decode} from 'html-entities';
 import { saveAs } from 'file-saver';
-import { Buffer } from 'buffer-es6';
+import { Buffer } from 'buffer';
 
 window.Buffer = Buffer;
 
