@@ -5,7 +5,9 @@ import { ref, computed} from "vue";
 import {encode} from 'html-entities';
 import {decode} from 'html-entities';
 import { saveAs } from 'file-saver';
-import { Buffer } from 'buffer';
+import { Buffer } from 'buffer-es6';
+
+window.Buffer = Buffer;
 
 //Hash methods
 import {Md5} from 'ts-md5';
