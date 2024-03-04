@@ -7,7 +7,7 @@ import {decode} from 'html-entities';
 import { saveAs } from 'file-saver';
 import { Buffer } from 'buffer';
 
-window.Buffer = Buffer;
+window.Buffer = window.Buffer || Buffer;
 
 //Hash methods
 import {Md5} from 'ts-md5';
