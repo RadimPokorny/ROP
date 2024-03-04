@@ -13,6 +13,7 @@ import router from './router'
 
 import '/node_modules/primeflex/primeflex.css'
 
+var global = window;
 
 //theme
 import './assets/theme.css';
