@@ -24,6 +24,9 @@ import EncryptRsa from 'encrypt-rsa';
 import NodeRSA from 'node-rsa';
 import * as crypto from "crypto-browserify";
 import * as CryptoJS from 'crypto-js';
+import random from 'js-crypto-random';
+import rsa from 'js-crypto-rsa';
+import keyutils from 'js-crypto-key-utils';
 
 
 //Object with all methods for dropdowns and references in the code
@@ -68,7 +71,7 @@ const groupedTypes = ref([
     label: 'Crypting',
     code: 'cr',
     items: [
-      { label: 'AES', value: 'AES'},
+      { label: 'AES-GCM', value: 'AES-GCM'},
       { label: 'RC', value: 'RC'},
       { label: 'RSA', value: 'RSA'},
       { label: 'DES', value: 'DES'}
@@ -272,32 +275,47 @@ async function DialogHashGenerate(this:any): Promise<void>{
 
 //Generate AES encrypted string
 async function DialogAesGenerateEn(this: any): Promise<void> {
-  if (secretkey.value.length != 16) {
-    alert('Private key must have 16 characters');
-  } else if (aesvector.value.length != 12) {
-    alert('Vector must have 12 characters');
-  } else {
-    const msg = new TextEncoder().encode(aesinput.value);
-    const key = new TextEncoder().encode(secretkey.value);
-    const iv = new TextEncoder().encode(aesvector.value);
-    console.log('Before encryption - msg:', msg, 'key:', key, 'iv:', iv);
-    // Use AES-GCM for encryption
-    const encrypted = await aes.encrypt(msg, key, { name: 'AES-GCM', iv, tagLength: 16 });
+  // if (secretkey.value.length != 16) {
+  //   alert('Private key must have 16 characters');
+  // } else if (aesvector.value.length != 12) {
+  //   alert('Vector must have 12 characters');
+  // } else {
+    // const msg = new TextEncoder().encode(aesinput.value);
+    // const key = new TextEncoder().encode(secretkey.value);
+    // const iv = new TextEncoder().encode(aesvector.value);
+    // console.log('Before encryption - msg:', msg, 'key:', key, 'iv:', iv);
+    // // Use AES-GCM for encryption
+    // const encrypted = await aes.encrypt(msg, key, { name: 'AES-GCM', iv, tagLength: 16 });
 
-    // Convert Uint8Array to a regular array
-    const encryptedArray = Array.from(new Uint8Array(encrypted));
+    // // Convert Uint8Array to a regular array
+    // const encryptedArray = Array.from(new Uint8Array(encrypted));
+
+    // const decrypted = await aes.decrypt(encrypted, key, {name: 'AES-GCM', iv, tagLength: 16});
+    // // Convert Uint8Array to a regular array
+    // const decryptedArray = Array.from(new Uint8Array(decrypted));
+    // console.log(decrypted);
+
+    const msg = new TextEncoder().encode(aesinput.value);
+  const key = new TextEncoder().encode(secretkey.value);
+  const iv = new TextEncoder().encode(aesvector.value);
+  const encrypted = await aes.encrypt(msg, key, {name: 'AES-GCM', iv, tagLength: 16});
+  const decrypted = await aes.decrypt(encrypted, key, {name: 'AES-GCM', iv, tagLength: 16});
+  console.log(msg.toString());
+  console.log(encrypted.toString());
+  console.log(decrypted.toString());
+  console.log(msg.toString() == decrypted.toString());
+
+  value2.value = btoa(String.fromCharCode.apply(null, encrypted));
+
+
 
     value.value = aesinput.value;
-    if (AESformats.value.value === 'Hex') {
-      selectedType2.value = groupedTypes.value[1].items[4];
-      value2.value = uint8ArrayToHex(new Uint8Array(encrypted));
-    } else {
+    
       selectedType2.value = groupedTypes.value[1].items[0];
-      value2.value = btoa(String.fromCharCode.apply(null, encryptedArray));
-    }
+    
 
     aesencryption.value = false;
-  }
+  
 }
 
 //Generate private and public key for AES encryption
@@ -350,50 +368,64 @@ function base64Encode(arrayBuffer: ArrayBuffer): string {
   }
   return btoa(base64);
 }
-
+var klicek;
 //Generate RSA encrypted output
 async function DialogRsaGenerateEn(this: any): Promise <void> {
 
-  const rsainput: string = value.value;
-  const keyPair = await generateRsaKeyPair();
-  const publicKey = keyPair.publicKey;
-  const pbk = await exportKeyInTextForm(keyPair.publicKey);
-  rsapublic.value = pbk;
-  const privateKey = keyPair.privateKey;
-  const prk = await exportKeyInTextForm(keyPair.privateKey);
-  rsaprivate.value = prk;
 
-  const encodedText = new TextEncoder().encode(rsainput);
-  const ciphertextBuffer = await window.crypto.subtle.encrypt(
-    {
-      name: "RSA-OAEP",
-    },
-    publicKey,
-    encodedText
+  rsa.generateKey(2048).then( (key) => {
+  // now you get the JWK public and private keys
+  const publicKey = key.publicKey;
+  rsapublic.value = JSON.stringify(publicKey);;
+  const privateKey = key.privateKey;
+klicek = key.privateKey;
+  rsaprivate.value = JSON.stringify(privateKey);;
+
+  const msg = new TextEncoder().encode(value.value);
+
+
+rsa.encrypt(
+msg,
+publicKey,
+'SHA-256', // optional, for OAEP. default is 'SHA-256'
+).then( (encrypted) => {
+// now you get an encrypted message in Uint8Array
+
+  console.log(encrypted);
+  value2.value = btoa(String.fromCharCode.apply(null, encrypted));
+
+  return rsa.decrypt(
+    encrypted,
+    privateKey,
+    'SHA-256', // optional, for OAEP. default is 'SHA-256'
   );
+}).then( (decrypted) => {
+console.log(decrypted.toString());
+});
+})
 
-  //Convert encrypted buffer to Base64 string
-  const ciphertextString = arrayBufferToBase64(ciphertextBuffer);
-  selectedType2.value = groupedTypes.value[1].items[0];
-  value2.value = ciphertextString;
-  aesencryption.value = false;
+ 
+
 }
+
+
 
 //Decrypt RSA string
 async function DialogRsaGenerateDe(this: any): Promise <void> {
 
-  const privateKey = rsaprivate.value;
-  const ciphertext = base64Decode(value.value);
+  const encrypted = Uint8Array.from(atob(value2.value), c => c.charCodeAt(0))
+  console.log(encrypted);
+  const privateKey: JsonWebKey = JSON.parse(rsaprivate.value);
+  console.log(privateKey.toString());
 
-    const decryptedBuffer = await window.crypto.subtle.decrypt(
-      {
-        name: "RSA-OAEP",
-      },
-      privateKey,
-      ciphertext
-    );
-
-  const decryptedText = new TextDecoder().decode(decryptedBuffer);
+rsa.decrypt(
+    encrypted,
+    klicek,
+    'SHA-256', // optional, for OAEP. default is 'SHA-256'
+).then( (decrypted) => {
+console.log(decrypted.toString());
+});
+ 
 
 }
 
@@ -482,14 +514,19 @@ async function DialogAesGenerateDe(this: any): Promise<void> {
   } else if (aesvector.value.length != 12) {
     alert('Vector must have 12 characters');
   } else {    
-    const data = new TextEncoder().encode(aesinput.value); 
+    // Convert Uint8Array to a regular array
+
+    const msg = new TextEncoder().encode(aesvector.value);
+    const data = Uint8Array.from(atob(aesinput.value), c => c.charCodeAt(0))
+    console.log(data.toString());
     const key = new TextEncoder().encode(secretkey.value);
     const iv = new TextEncoder().encode(aesvector.value);
-    console.log('Before encryption - msg:', data, 'key:', key, 'iv:', iv);
-    const decrypted = await aes.decrypt(data, key, {name: 'AES-GCM', iv});
-    // Convert Uint8Array to a regular array
-    const decryptedArray = Array.from(new Uint8Array(decrypted));
-    console.log(decryptedArray);
+    const encrypted = await aes.encrypt(msg, key, {name: 'AES-GCM', iv, tagLength: 16});
+    const decrypted = await aes.decrypt(data, key, {name: 'AES-GCM', iv, tagLength: 16});
+    console.log(msg.toString());
+    console.log(decrypted.toString());
+    console.log(msg.toString() == decrypted.toString());
+    value2.value = new TextDecoder('utf-8').decode(decrypted);
     aesdecryption.value = false;
   }
 }
@@ -876,7 +913,7 @@ async function onChange() {
 
         break;
       }
-      case 'AES':{
+      case 'AES-GCM':{
         if(isAesOpenDe.value == false){
           aesdecryption.value = true;
           isAesOpenDe.value = true;
@@ -1046,7 +1083,7 @@ async function onChange() {
         value2.value = result.hashHex;
         break;
       }
-      case 'AES':{
+      case 'AES-GCM':{
         if(isAesOpenEn.value == false){
           aesencryption.value = true;
           isAesOpenEn.value = true;
@@ -1227,16 +1264,18 @@ const isSwapButtonDisabled = computed(() => {
             </div>
             <div id="btn-argon" class="button">
               <Button
-                label="Par."
-                aria-label="par."
+                icon="pi pi-cog"
+                aria-label="Options"
                 @click="visible = true"
                 style="width: 59.2px; height: 59.2px; margin-right: 20px;"
               />
             </div>
             <template>
               <div class="card flex justify-content-center">
-                  <Button label="Show" @click="visible = true" />
-                  <Dialog v-model:visible="visible" modal header="Argon2" :style="{ width: '26rem' }">
+                  <Button 
+                    label="Show" 
+                    @click="visible = true" />
+                  <Dialog :closable="false" v-model:visible="visible" modal header="Argon2" :style="{ width: '26rem' }">
                       <span class="p-text-secondary block mb-5">Enter parameters for hashing</span>
                       <div class="flex align-items-center gap-3 mb-5">
                           <label for="salt" class="font-semibold w-6rem">Salt</label>
@@ -1266,7 +1305,7 @@ const isSwapButtonDisabled = computed(() => {
                           <Button type="button" label="Generate hash" @click="DialogHashGenerate()"></Button>
                       </div>
                   </Dialog>
-                  <Dialog v-model:visible="aesencryption" modal header="AES Encryption" :style="{ width: '26rem' }">
+                  <Dialog :closable="false" v-model:visible="aesencryption" modal header="AES-GCM Encryption" :style="{ width: '26rem' }">
                       <span class="p-text-secondary block mb-5">Enter parameters for encrypting.</span>
                       <div class="flex align-items-center gap-3 mb-3">
                           <label for="aesinput" class="font-semibold w-6rem">Input</label>
@@ -1280,16 +1319,12 @@ const isSwapButtonDisabled = computed(() => {
                       <label for="aes-secret" class="font-semibold w-6rem">Secret key</label>
                       <InputText v-model="secretkey" id="aes-secret" class="flex-auto" autocomplete="off" />
                     </div>
-                    <div class="flex align-items-center gap-3 mb-2">
-                      <label for="aesformats" class="font-semibold w-6rem">Output text format</label>
-                      <Dropdown id="aesformats" v-model="AESformats" :options="AEStextformat" optionLabel="name" placeholder="Output format" class="w-full md:w-16rem" />
-                    </div>
                     <template #footer>
                       <Button type="button" label="Cancel" text severity="secondary" @click="aesencryption = false; isAesOpenEn = false" ></Button>
                       <Button type="button" label="Save" @click="DialogAesGenerateEn(); isAesOpenEn = false" ></Button>
                     </template>
                   </Dialog>
-                  <Dialog v-model:visible="aesdecryption" modal header="AES Decryption" :style="{ width: '26rem' }">
+                  <Dialog :closable="false" v-model:visible="aesdecryption" modal header="AES-GCM Decryption" :style="{ width: '26rem' }">
                       <span class="p-text-secondary block mb-5">Enter parameters for decrypting.</span>
                       <div class="flex align-items-center gap-3 mb-3">
                           <label for="aesinput" class="font-semibold w-6rem">Input</label>
@@ -1314,7 +1349,7 @@ const isSwapButtonDisabled = computed(() => {
                       <Button type="button" label="Save" @click="DialogAesGenerateDe(); isAesOpenDe = false" ></Button>
                     </template>
                   </Dialog>
-                  <Dialog v-model:visible="rsaencryption" modal header="RSA Encryption" :style="{ width: '26rem' }">
+                  <Dialog :closable="false" v-model:visible="rsaencryption" modal header="RSA Encryption" :style="{ width: '26rem' }">
                     <span class="p-text-secondary block mb-5">Enter parameters for encrypting. Press button save for new keys and output</span>
                     <div id="aes-vector" class="flex align-items-center gap-3 mb-2">
                       <label for="rsa-public" class="font-semibold w-6rem">Public key</label>
@@ -1329,7 +1364,7 @@ const isSwapButtonDisabled = computed(() => {
                     <Button type="button" label="Save" @click="DialogRsaGenerateEn(); isRsaOpenEn = false;" ></Button>
                   </template>
                 </Dialog>
-                <Dialog v-model:visible="rsadecryption" modal header="RSA Decryption" :style="{ width: '26rem' }">
+                <Dialog :closable="false" v-model:visible="rsadecryption" modal header="RSA Decryption" :style="{ width: '26rem' }">
                   <span class="p-text-secondary block mb-5">Enter parameters for decrypting.</span>
                   <div class="flex align-items-center gap-3 mb-3">
                       <label for="rsainput" class="font-semibold w-6rem">Input</label>
@@ -1344,7 +1379,7 @@ const isSwapButtonDisabled = computed(() => {
                   <Button type="button" label="Save" @click="DialogRsaGenerateDe(); isRsaOpenDe = false" ></Button>
                 </template>
               </Dialog>
-              <Dialog v-model:visible="rcencryption" modal header="RC Encryption" :style="{ width: '26rem' }">
+              <Dialog :closable="false" v-model:visible="rcencryption" modal header="RC Encryption" :style="{ width: '26rem' }">
                 <span class="p-text-secondary block mb-5">Enter parameters for encrypting. Press button save for new key and output</span>
                 <div class="flex align-items-center gap-3 mb-3">
                     <label for="rcinput" class="font-semibold w-6rem">Input</label>
@@ -1359,7 +1394,7 @@ const isSwapButtonDisabled = computed(() => {
                 <Button type="button" label="Save" @click="DialogRcGenerateEn(generateRandomKey(16)); isRcOpenEn = false" ></Button>
               </template>
             </Dialog>
-            <Dialog v-model:visible="rcdecryption" modal header="RC Decryption" :style="{ width: '26rem' }">
+            <Dialog :closable="false" v-model:visible="rcdecryption" modal header="RC Decryption" :style="{ width: '26rem' }">
                 <span class="p-text-secondary block mb-5">Enter parameters for decrypting.</span>
                 <div class="flex align-items-center gap-3 mb-3">
                     <label for="rcinput" class="font-semibold w-6rem">Input</label>
@@ -1374,7 +1409,7 @@ const isSwapButtonDisabled = computed(() => {
                 <Button type="button" label="Save" @click="DialogRcGenerateDe(); isRcOpenDe = false" ></Button>
               </template>
             </Dialog>
-            <Dialog v-model:visible="desencryption" modal header="DES Encryption" :style="{ width: '26rem' }">
+            <Dialog :closable="false" v-model:visible="desencryption" modal header="DES Encryption" :style="{ width: '26rem' }">
                 <span class="p-text-secondary block mb-5">Enter parameters for encrypting.</span>
                 <div class="flex align-items-center gap-3 mb-3">
                     <label for="desinput" class="font-semibold w-6rem">Input</label>
@@ -1386,10 +1421,10 @@ const isSwapButtonDisabled = computed(() => {
               </div>
               <template #footer>
                 <Button type="button" label="Cancel" text severity="secondary" @click="desencryption = false; isDesOpenEn = false" ></Button>
-                <Button type="button" label="Save" @click="DialogDesGenerateEn(); isDesOpenEn = false" ></Button>
+                <Button type="button" label="Save" @click="DialogDesGenerateEn(); isDesOpenEn = false, desencryption = false" ></Button>
               </template>
             </Dialog>
-            <Dialog v-model:visible="desdecryption" modal header="DES Decryption" :style="{ width: '26rem' }">
+            <Dialog :closable="false" v-model:visible="desdecryption" closable="false" modal header="DES Decryption" :style="{ width: '26rem' }" >
                 <span class="p-text-secondary block mb-5">Enter parameters for decrypting.</span>
                 <div class="flex align-items-center gap-3 mb-3">
                     <label for="desinput" class="font-semibold w-6rem">Input</label>
@@ -1401,7 +1436,7 @@ const isSwapButtonDisabled = computed(() => {
               </div>
               <template #footer>
                 <Button type="button" label="Cancel" text severity="secondary" @click="desdecryption = false; isDesOpenDe = false" ></Button>
-                <Button type="button" label="Save" @click="DialogDesGenerateDe(); isDesOpenDe = false" ></Button>
+                <Button type="button" label="Save" @click="DialogDesGenerateDe(); isDesOpenDe = false; desdecryption = false;" ></Button>
               </template>
             </Dialog>
               </div>
