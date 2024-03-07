@@ -27,6 +27,7 @@ import * as CryptoJS from 'crypto-js';
 import random from 'js-crypto-random';
 import rsa from 'js-crypto-rsa';
 import keyutils from 'js-crypto-key-utils';
+import {pem2jwk,jwk2pem} from 'pem-jwk'
 
 
 //Object with all methods for dropdowns and references in the code
@@ -368,7 +369,7 @@ function base64Encode(arrayBuffer: ArrayBuffer): string {
   }
   return btoa(base64);
 }
-var klicek;
+
 //Generate RSA encrypted output
 async function DialogRsaGenerateEn(this: any): Promise <void> {
 
@@ -376,10 +377,10 @@ async function DialogRsaGenerateEn(this: any): Promise <void> {
   rsa.generateKey(2048).then( (key) => {
   // now you get the JWK public and private keys
   const publicKey = key.publicKey;
-  rsapublic.value = JSON.stringify(publicKey);;
+  rsapublic.value = jwk2pem(publicKey);
   const privateKey = key.privateKey;
-klicek = key.privateKey;
-  rsaprivate.value = JSON.stringify(privateKey);;
+  console.log(JSON.stringify(privateKey));
+  rsaprivate.value = jwk2pem(privateKey);
 
   const msg = new TextEncoder().encode(value.value);
 
@@ -392,7 +393,7 @@ publicKey,
 // now you get an encrypted message in Uint8Array
 
   console.log(encrypted);
-  value2.value = btoa(String.fromCharCode.apply(null, encrypted));
+  value2.value = arrayBufferToBase64(encrypted);
 
   return rsa.decrypt(
     encrypted,
@@ -413,17 +414,19 @@ console.log(decrypted.toString());
 //Decrypt RSA string
 async function DialogRsaGenerateDe(this: any): Promise <void> {
 
-  const encrypted = Uint8Array.from(atob(value2.value), c => c.charCodeAt(0))
+  const encrypted = base64Decode(rsainput.value);
   console.log(encrypted);
-  const privateKey: JsonWebKey = JSON.parse(rsaprivate.value);
+  console.log(rsainput.value);
+  const privateKey: JsonWebKey = pem2jwk(rsaprivate.value);
+  console.log(JSON.stringify(privateKey));
   console.log(privateKey.toString());
 
 rsa.decrypt(
     encrypted,
-    klicek,
+    privateKey,
     'SHA-256', // optional, for OAEP. default is 'SHA-256'
 ).then( (decrypted) => {
-console.log(decrypted.toString());
+  value2.value = new TextDecoder('utf-8').decode(decrypted);
 });
  
 
@@ -475,20 +478,19 @@ function generateRandomKey(length: number): string {
     return randomKey;
 }
 
-
-//Decode Base64 to ArrayBuffer
-function base64Decode(base64String: string): ArrayBuffer {
+// Decode Base64 to Uint8Array
+function base64Decode(base64String: string): Uint8Array {
   const binaryString = atob(base64String);
   const length = binaryString.length;
   const bytes = new Uint8Array(length);
   for (let i = 0; i < length; i++) {
     bytes[i] = binaryString.charCodeAt(i);
   }
-  return bytes.buffer;
+  return bytes;
 }
 
 //ArrayBuffer to Base64
-function arrayBufferToBase64(buffer: ArrayBuffer): string {
+function arrayBufferToBase64(buffer: Uint8Array): string {
   const uint8Array = new Uint8Array(buffer);
   const binaryString = uint8Array.reduce((acc, byte) => acc + String.fromCharCode(byte), '');
   return btoa(binaryString);
@@ -1424,7 +1426,7 @@ const isSwapButtonDisabled = computed(() => {
                 <Button type="button" label="Save" @click="DialogDesGenerateEn(); isDesOpenEn = false, desencryption = false" ></Button>
               </template>
             </Dialog>
-            <Dialog :closable="false" v-model:visible="desdecryption" closable="false" modal header="DES Decryption" :style="{ width: '26rem' }" >
+            <Dialog :closable="false" v-model:visible="desdecryption" modal header="DES Decryption" :style="{ width: '26rem' }" >
                 <span class="p-text-secondary block mb-5">Enter parameters for decrypting.</span>
                 <div class="flex align-items-center gap-3 mb-3">
                     <label for="desinput" class="font-semibold w-6rem">Input</label>
