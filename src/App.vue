@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 //Coding and general methods
 import { ref, computed} from "vue";
 import {encode} from 'html-entities';
@@ -20,13 +19,8 @@ import argon2 from 'argon2-browser/dist/argon2-bundled.min.js';
 
 //Encryption methods
 import aes from 'js-crypto-aes';
-import EncryptRsa from 'encrypt-rsa';
-import NodeRSA from 'node-rsa';
-import * as crypto from "crypto-browserify";
 import * as CryptoJS from 'crypto-js';
-import random from 'js-crypto-random';
 import rsa from 'js-crypto-rsa';
-import keyutils from 'js-crypto-key-utils';
 import {pem2jwk,jwk2pem} from 'pem-jwk'
 
 
@@ -276,37 +270,15 @@ async function DialogHashGenerate(this:any): Promise<void>{
 
 //Generate AES encrypted string
 async function DialogAesGenerateEn(this: any): Promise<void> {
-  // if (secretkey.value.length != 16) {
-  //   alert('Private key must have 16 characters');
-  // } else if (aesvector.value.length != 12) {
-  //   alert('Vector must have 12 characters');
-  // } else {
-    // const msg = new TextEncoder().encode(aesinput.value);
-    // const key = new TextEncoder().encode(secretkey.value);
-    // const iv = new TextEncoder().encode(aesvector.value);
-    // console.log('Before encryption - msg:', msg, 'key:', key, 'iv:', iv);
-    // // Use AES-GCM for encryption
-    // const encrypted = await aes.encrypt(msg, key, { name: 'AES-GCM', iv, tagLength: 16 });
-
-    // // Convert Uint8Array to a regular array
-    // const encryptedArray = Array.from(new Uint8Array(encrypted));
-
-    // const decrypted = await aes.decrypt(encrypted, key, {name: 'AES-GCM', iv, tagLength: 16});
-    // // Convert Uint8Array to a regular array
-    // const decryptedArray = Array.from(new Uint8Array(decrypted));
-    // console.log(decrypted);
 
     const msg = new TextEncoder().encode(aesinput.value);
   const key = new TextEncoder().encode(secretkey.value);
   const iv = new TextEncoder().encode(aesvector.value);
   const encrypted = await aes.encrypt(msg, key, {name: 'AES-GCM', iv, tagLength: 16});
   const decrypted = await aes.decrypt(encrypted, key, {name: 'AES-GCM', iv, tagLength: 16});
-  console.log(msg.toString());
-  console.log(encrypted.toString());
-  console.log(decrypted.toString());
-  console.log(msg.toString() == decrypted.toString());
 
-  value2.value = btoa(String.fromCharCode.apply(null, encrypted));
+  
+  value2.value = btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(encrypted))));
 
 
 
@@ -319,107 +291,63 @@ async function DialogAesGenerateEn(this: any): Promise<void> {
   
 }
 
-//Generate private and public key for AES encryption
-async function generateRsaKeyPair(): Promise<CryptoKeyPair> {
-  try {
-    const keyPair = await window.crypto.subtle.generateKey(
-      {
-        name: "RSA-OAEP",
-        modulusLength: 2048,
-        publicExponent: new Uint8Array([1, 0, 1]),
-        hash: "SHA-256",
-      },
-      true,
-      ["encrypt", "decrypt"]
-    );
-
-    return keyPair;
-  } catch (error) {
-    console.error("Error while generating the AES keys", error);
-    throw error;
-  }
-}
-
-//Get string from the keys
-async function exportKeyInTextForm(key: CryptoKey): Promise<string> {
-  try {
-    if (key.type === 'public') {
-      // Veřejný klíč můžeme exportovat pomocí "spki"
-      const exportedKey = await window.crypto.subtle.exportKey("spki", key);
-      return base64Encode(exportedKey);
-    } else if (key.type === 'private') {
-      // Soukromý klíč můžeme exportovat pomocí "pkcs8"
-      const exportedKey = await window.crypto.subtle.exportKey("pkcs8", key);
-      return base64Encode(exportedKey);
-    } else {
-      throw new Error('Unknown key type: ' + key.type);
-    }
-  } catch (error) {
-    console.error("Error while exporting:", error);
-    throw error;
-  }
-}
-
-//Encode to base64
-function base64Encode(arrayBuffer: ArrayBuffer): string {
-  const binary = new Uint8Array(arrayBuffer);
-  let base64 = '';
-  for (let i = 0; i < binary.length; i++) {
-    base64 += String.fromCharCode(binary[i]);
-  }
-  return btoa(base64);
-}
-
 //Generate RSA encrypted output
 async function DialogRsaGenerateEn(this: any): Promise <void> {
 
 
   rsa.generateKey(2048).then( (key) => {
-  // now you get the JWK public and private keys
-  const publicKey = key.publicKey;
-  rsapublic.value = jwk2pem(publicKey);
-  const privateKey = key.privateKey;
-  console.log(JSON.stringify(privateKey));
-  rsaprivate.value = jwk2pem(privateKey);
+    // now you get the JWK public and private keys
+    const publicKey = key.publicKey;
+    rsapublic.value = jwk2pem(publicKey);
+    const privateKey = key.privateKey;
+    rsaprivate.value = jwk2pem(privateKey);
+    // Zjistění typu proměnné
 
-  const msg = new TextEncoder().encode(value.value);
+// Nyní můžete vypsat typ do konzole
+    const msg = new TextEncoder().encode(value.value);
 
-
-rsa.encrypt(
-msg,
-publicKey,
-'SHA-256', // optional, for OAEP. default is 'SHA-256'
-).then( (encrypted) => {
-// now you get an encrypted message in Uint8Array
-
-  console.log(encrypted);
-  value2.value = arrayBufferToBase64(encrypted);
-
-  return rsa.decrypt(
-    encrypted,
-    privateKey,
+    rsa.encrypt(
+    msg,
+    publicKey,
     'SHA-256', // optional, for OAEP. default is 'SHA-256'
-  );
-}).then( (decrypted) => {
-console.log(decrypted.toString());
-});
-})
-
- 
+  ).then( (encrypted) => {
+    // now you get an encrypted message in Uint8Array
+    value2.value = arrayBufferToBase64(encrypted);
+    return rsa.decrypt(
+      encrypted,
+      privateKey,
+      'SHA-256', // optional, for OAEP. default is 'SHA-256'
+    );
+    }).then( (decrypted) => {
+    });
+  })
+  selectedType2.value = groupedTypes.value[1].items[0];
 
 }
 
+//Fix pem key
+function fixPrivateKeyFormat(privateKey: string): string {
+  const trimmedKey = privateKey.trim();
+  const endKeyIndex = trimmedKey.lastIndexOf("-----END RSA PRIVATE KEY-----");
 
+  if (endKeyIndex !== -1) {
+    const keyPart = trimmedKey.substring(0, endKeyIndex).trim();
+    const endKeyPart = trimmedKey.substring(endKeyIndex).trim();
+
+    return `${keyPart}\n${endKeyPart}`;
+  }
+
+  return trimmedKey;
+}
 
 //Decrypt RSA string
 async function DialogRsaGenerateDe(this: any): Promise <void> {
 
   const encrypted = base64Decode(rsainput.value);
-  console.log(encrypted);
-  console.log(rsainput.value);
-  const privateKey: JsonWebKey = pem2jwk(rsaprivate.value);
-  console.log(JSON.stringify(privateKey));
-  console.log(privateKey.toString());
+  
+  const pemKey = fixPrivateKeyFormat(rsaprivate.value);
+  try{
+  const privateKey = await pemToJwk(pemKey);
 
 rsa.decrypt(
     encrypted,
@@ -428,8 +356,16 @@ rsa.decrypt(
 ).then( (decrypted) => {
   value2.value = new TextDecoder('utf-8').decode(decrypted);
 });
- 
+}
+catch(error){
+  alert('Wrong key format. The key is probably only on one line. Try fixing it to multiple lines for PEM format.');
+}
+selectedType2.value = groupedTypes.value[0].items[0];
+selectedType  .value = groupedTypes.value[0].items[0];
+}
 
+async function pemToJwk(pemKey: string): Promise<JsonWebKey> {
+  return await pem2jwk(pemKey);
 }
 
 //Generage encrypted string
@@ -496,19 +432,6 @@ function arrayBufferToBase64(buffer: Uint8Array): string {
   return btoa(binaryString);
 }
 
-//Convert hex string to plaintext
-function hexToPlainText(hex: string): string {
-  const uint8Array = hexToUint8Array(hex);
-  const textDecoder = new TextDecoder('utf-8'); // nebo jiný kódování podle potřeby
-  return textDecoder.decode(uint8Array);
-}
-
-//ArrayBuffer to string
-function arrayBufferToString(buffer: ArrayBuffer): string {
-  const decoder = new TextDecoder('utf-8');
-  return decoder.decode(buffer);
-}
-
 //Decrypt AES input
 async function DialogAesGenerateDe(this: any): Promise<void> {
   if (secretkey.value.length != 16) {
@@ -517,27 +440,15 @@ async function DialogAesGenerateDe(this: any): Promise<void> {
     alert('Vector must have 12 characters');
   } else {    
     // Convert Uint8Array to a regular array
-
     const msg = new TextEncoder().encode(aesvector.value);
     const data = Uint8Array.from(atob(aesinput.value), c => c.charCodeAt(0))
-    console.log(data.toString());
     const key = new TextEncoder().encode(secretkey.value);
     const iv = new TextEncoder().encode(aesvector.value);
     const encrypted = await aes.encrypt(msg, key, {name: 'AES-GCM', iv, tagLength: 16});
     const decrypted = await aes.decrypt(data, key, {name: 'AES-GCM', iv, tagLength: 16});
-    console.log(msg.toString());
-    console.log(decrypted.toString());
-    console.log(msg.toString() == decrypted.toString());
     value2.value = new TextDecoder('utf-8').decode(decrypted);
     aesdecryption.value = false;
   }
-}
-
-//Converts uint8array to hexadecimal value
-function uint8ArrayToHex(uint8Array: Uint8Array) {
-  return Array.from(uint8Array)
-    .map(byte => byte.toString(16).padStart(2, '0'))
-    .join('');
 }
 
 //Hexadecimal to Uint8Array
@@ -1352,14 +1263,14 @@ const isSwapButtonDisabled = computed(() => {
                     </template>
                   </Dialog>
                   <Dialog :closable="false" v-model:visible="rsaencryption" modal header="RSA Encryption" :style="{ width: '26rem' }">
-                    <span class="p-text-secondary block mb-5">Enter parameters for encrypting. Press button save for new keys and output</span>
+                    <span class="p-text-secondary block mb-5">Enter parameters for encrypting. Press button save for new keys and output. Please do not paste keys in one line. The key will then have the wrong format </span>
                     <div id="aes-vector" class="flex align-items-center gap-3 mb-2">
                       <label for="rsa-public" class="font-semibold w-6rem">Public key</label>
                       <InputText v-model="rsapublic" id="rsa-public" class="flex-auto" autocomplete="off" />
                     </div>
                   <div class="flex align-items-center gap-3 mb-2">
                     <label for="rsa-private" class="font-semibold w-6rem">Private key</label>
-                    <InputText v-model="rsaprivate" id="rsa-private" class="flex-auto" autocomplete="off" />
+                    <Textarea v-model="rsaprivate" id="rsa-private" class="flex-auto" autocomplete="off" />
                   </div>
                   <template #footer>
                     <Button type="button" label="Cancel" text severity="secondary" @click="rsaencryption = false; isAesOpenDe = false" ></Button>
@@ -1374,7 +1285,7 @@ const isSwapButtonDisabled = computed(() => {
                   </div>
                 <div class="flex align-items-center gap-3 mb-2">
                   <label for="rsa-private" class="font-semibold w-6rem">Private key</label>
-                  <InputText v-model="rsaprivate" id="rsa-private" class="flex-auto" autocomplete="off" />
+                  <Textarea v-model="rsaprivate" id="rsa-private" class="flex-auto" autocomplete="off" />
                 </div>
                 <template #footer>
                   <Button type="button" label="Cancel" text severity="secondary" @click="rsadecryption = false; isAesOpenDe = false" ></Button>
