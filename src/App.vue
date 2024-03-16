@@ -254,36 +254,57 @@ function generateSalt(): String {
 
 //Generate hash with values from the dialog
 async function DialogHashGenerate(this:any): Promise<void>{
-  argon2visible.value = false;
-  const result = await argon2.hash({
-    pass: value.value,
-    salt: generateSalt(),
-    time: argonite.value,
-    mem: argonmem.value,
-    hashLen: argonlen.value,
-    parallelism: argonpar.value,
-    type: argon2.ArgonType.Argon2d,
-  });
+    argon2visible.value = false;
 
-  value2.value = result.hashHex;
+    if (
+        isNaN(argonite.value) ||
+        isNaN(argonmem.value) ||
+        isNaN(argonlen.value) ||
+        isNaN(argonpar.value)
+    ) {
+        alert('Please enter valid numbers.');
+        return;
+    }
+
+    const result = await argon2.hash({
+        pass: value.value,
+        salt: generateSalt(),
+        time: argonite.value,
+        mem: argonmem.value,
+        hashLen: argonlen.value,
+        parallelism: argonpar.value,
+        type: argon2.ArgonType.Argon2d,
+    });
+
+    value2.value = result.hashHex;
 }
-
 //Generate AES encrypted string
 async function DialogAesGenerateEn(this: any): Promise<void> {
+  
+  const keyLength = secretkey.value.length;
 
+  if (keyLength !== 16 && keyLength !== 32) {
+    alert('Invalid key length. Key length must be 16 or 32 bytes.');
+  }
+  else if(aesvector.value.length !== 12){
+    alert('Invalid vector length. Key length must be 12 bytes.');
+  }
+  else{
   const msg = new TextEncoder().encode(aesinput.value);
   const key = new TextEncoder().encode(secretkey.value);
   const iv = new TextEncoder().encode(aesvector.value);
   const encrypted = await aes.encrypt(msg, key, {name: 'AES-GCM', iv, tagLength: 16});
   const decrypted = await aes.decrypt(encrypted, key, {name: 'AES-GCM', iv, tagLength: 16});
-  
+
   value2.value = btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(encrypted))));
 
   value.value = aesinput.value;
     
   selectedType2.value = groupedTypes.value[1].items[0];
-
   aesencryption.value = false;
+  }
+  
+  
 }
 
 //Generate RSA encrypted output
@@ -337,11 +358,11 @@ function fixPrivateKeyFormat(privateKey: string): string {
 
 //Decrypt RSA string
 async function DialogRsaGenerateDe(this: any): Promise <void> {
-
+  try{
   const encrypted = base64Decode(rsainput.value);
   
   const pemKey = fixPrivateKeyFormat(rsaprivate.value);
-  try{
+  
   const privateKey = await pemToJwk(pemKey);
 
 rsa.decrypt(
@@ -353,7 +374,7 @@ rsa.decrypt(
 });
 }
 catch(error){
-  alert('Wrong key format. The key is probably only on one line. Try fixing it to multiple lines for PEM format.');
+  alert('Wrong key or input format. The key is probably only on one line. Try fixing it to multiple lines for PEM format.');
 }
 selectedType2.value = groupedTypes.value[0].items[0];
 selectedType  .value = groupedTypes.value[0].items[0];
@@ -372,21 +393,28 @@ async function DialogRcGenerateEn(this:any, dynamicKey: string ): Promise <void>
 }
 
 //Decrypt encrypted string
-async function DialogRcGenerateDe(this:any): Promise <void>{
-  const pastedKey = rcprivate.value;
-  const decrypted = CryptoJS.RC4.decrypt(value.value, pastedKey);
-  const decryptedText = decrypted.toString(CryptoJS.enc.Utf8);
-  selectedType.value = groupedTypes.value[0].items[0];
-  value2.value = decryptedText;
-  rcdecryption.value = false;
+async function DialogRcGenerateDe(this:any): Promise<void> {
+  try {
+    const pastedKey = rcprivate.value;
+    const decrypted = CryptoJS.RC4.decrypt(value.value, pastedKey);
+    const decryptedText = decrypted.toString(CryptoJS.enc.Utf8);
+    selectedType.value = groupedTypes.value[0].items[0];
+    value2.value = decryptedText;
+    rcdecryption.value = false;
+  } catch (error: any) {
+    if (error.message === 'Malformed UTF-8 data') {
+      alert('Wrong key format.');
+    } else {
+      alert('Something went wrong.');
+    }
+  }
 }
 
-
 //Encrypt string to the DES base64 output
-async function DialogDesGenerateEn(this:any): Promise <void>{
-  const encryptedData = CryptoJS.DES.encrypt(value.value, desprivate.value).toString();
+async function DialogDesGenerateEn(this:any, dynamicKey: string): Promise <void>{
+  desprivate.value = dynamicKey;
+  const encryptedData = CryptoJS.DES.encrypt(value.value, dynamicKey).toString();
   value2.value = encryptedData;
-  desencryption.value = false;
   selectedType2.value = groupedTypes.value[1].items[0];
 }
 
@@ -1219,18 +1247,18 @@ const isSwapButtonDisabled = computed(() => {
                           <label for="aesinput" class="font-semibold w-6rem">Input</label>
                           <InputText id="aesinput" v-model="aesinput" class="flex-auto" autocomplete="off"/>
                       </div>
-                      <div id="aes-vector" class="flex align-items-center gap-3 mb-2">
+                      <div id="aes-vector" class="flex align-items-center gap-3 mb-3">
                         <label for="aes-vector" class="font-semibold w-6rem">Vector</label>
                         <InputText v-model="aesvector" id="aes-vector" class="flex-auto" autocomplete="off" />
                       </div>
-                    <div class="flex align-items-center gap-3 mb-2">
+                    <div class="flex align-items-center gap-3 mb-3">
                       <label for="aes-secret" class="font-semibold w-6rem">Secret key</label>
                       <InputText v-model="secretkey" id="aes-secret" class="flex-auto" autocomplete="off" />
                     </div>
-                    <template #footer>
-                      <Button type="button" label="Cancel" text severity="secondary" @click="aesencryption = false; isAesOpenEn = false" ></Button>
+                    <div class="flex justify-content-end gap-2">
+                      <Button type="button" label="Cancel" text severity="secondary" @click="aesencryption = false; isAesOpenEn = false; selectedType2 = groupedTypes[1].items[0];" ></Button>
                       <Button type="button" label="Save" @click="DialogAesGenerateEn(); isAesOpenEn = false" ></Button>
-                    </template>
+                    </div>
                   </Dialog>
                   <Dialog :closable="false" v-model:visible="aesdecryption" modal header="AES-GCM Decryption" :style="{ width: '26rem' }">
                       <span class="p-text-secondary block mb-5">Enter parameters for decrypting.</span>
@@ -1238,24 +1266,20 @@ const isSwapButtonDisabled = computed(() => {
                           <label for="aesinput" class="font-semibold w-6rem">Input</label>
                           <InputText id="aesinput" v-model="aesinput" class="flex-auto" autocomplete="off"/>
                       </div>
-                      <div id="aes-vector" class="flex align-items-center gap-3 mb-2">
+                      <div id="aes-vector" class="flex align-items-center gap-3 mb-3">
                         <label for="aes-vector" class="font-semibold w-6rem">Vector</label>
                         <InputText v-model="aesvector" id="aes-vector" class="flex-auto" autocomplete="off" />
 
                     </div>
 
-                    <div class="flex align-items-center gap-3 mb-2">
+                    <div class="flex align-items-center gap-3 mb-3">
                       <label for="aes-secret" class="font-semibold w-6rem">Secret key</label>
                       <InputText v-model="secretkey" id="aes-secret" class="flex-auto" autocomplete="off" />
                     </div>
-                    <div class="flex align-items-center gap-3 mb-2">
-                      <label for="aesformats" class="font-semibold w-6rem">Output text format</label>
-                      <Dropdown id="aesformats" v-model="AESformats" :options="AEStextformat" optionLabel="name" placeholder="Output format" class="w-full md:w-16rem" />
-                    </div>
-                    <template #footer>
-                      <Button type="button" label="Cancel" text severity="secondary" @click="aesdecryption = false; isAesOpenDe = false" ></Button>
+                    <div class="flex justify-content-end gap-2">
+                      <Button type="button" label="Cancel" text severity="secondary" @click="aesdecryption = false; isAesOpenDe = false; selectedType = groupedTypes[0].items[0];" ></Button>
                       <Button type="button" label="Save" @click="DialogAesGenerateDe(); isAesOpenDe = false" ></Button>
-                    </template>
+                    </div>
                   </Dialog>
                   <Dialog :closable="false" v-model:visible="rsaencryption" modal header="RSA Encryption" :style="{ width: '26rem' }">
                     <span class="p-text-secondary block mb-5">Enter parameters for encrypting. Press button save for new keys and output. Please do not paste keys in one line. The key will then have the wrong format </span>
@@ -1267,10 +1291,10 @@ const isSwapButtonDisabled = computed(() => {
                     <label for="rsa-private" class="font-semibold w-6rem">Private key</label>
                     <Textarea v-model="rsaprivate" id="rsa-private" class="flex-auto" autocomplete="off" />
                   </div>
-                  <template #footer>
-                    <Button type="button" label="Cancel" text severity="secondary" @click="rsaencryption = false; isAesOpenDe = false" ></Button>
+                  <div class="flex justify-content-end gap-2">
+                    <Button type="button" label="Cancel" text severity="secondary" @click="rsaencryption = false; isAesOpenDe = false; selectedType2 = groupedTypes[1].items[0];" ></Button>
                     <Button type="button" label="Save" @click="DialogRsaGenerateEn(); isRsaOpenEn = false;" ></Button>
-                  </template>
+                  </div>
                 </Dialog>
                 <Dialog :closable="false" v-model:visible="rsadecryption" modal header="RSA Decryption" :style="{ width: '26rem' }">
                   <span class="p-text-secondary block mb-5">Enter parameters for decrypting.</span>
@@ -1282,10 +1306,10 @@ const isSwapButtonDisabled = computed(() => {
                   <label for="rsa-private" class="font-semibold w-6rem">Private key</label>
                   <Textarea v-model="rsaprivate" id="rsa-private" class="flex-auto" autocomplete="off" />
                 </div>
-                <template #footer>
-                  <Button type="button" label="Cancel" text severity="secondary" @click="rsadecryption = false; isAesOpenDe = false" ></Button>
+                <div class="flex justify-content-end gap-2">
+                  <Button type="button" label="Cancel" text severity="secondary" @click="rsadecryption = false; isAesOpenDe = false; selectedType = groupedTypes[0].items[0];" ></Button>
                   <Button type="button" label="Save" @click="DialogRsaGenerateDe(); isRsaOpenDe = false" ></Button>
-                </template>
+                </div>
               </Dialog>
               <Dialog :closable="false" v-model:visible="rcencryption" modal header="RC Encryption" :style="{ width: '26rem' }">
                 <span class="p-text-secondary block mb-5">Enter parameters for encrypting. Press button save for new key and output</span>
@@ -1297,10 +1321,10 @@ const isSwapButtonDisabled = computed(() => {
                 <label for="rc-secret" class="font-semibold w-6rem">Secret key</label>
                 <InputText v-model="rcprivate" id="rc-secret" class="flex-auto" autocomplete="off" />
               </div>
-              <template #footer>
-                <Button type="button" label="Cancel" text severity="secondary" @click="rcencryption = false; isRcOpenEn = false" ></Button>
+              <div class="flex justify-content-end gap-2">
+                <Button type="button" label="Cancel" text severity="secondary" @click="rcencryption = false; isRcOpenEn = false; selectedType2 = groupedTypes[1].items[0];" ></Button>
                 <Button type="button" label="Save" @click="DialogRcGenerateEn(generateRandomKey(16)); isRcOpenEn = false" ></Button>
-              </template>
+              </div>
             </Dialog>
             <Dialog :closable="false" v-model:visible="rcdecryption" modal header="RC Decryption" :style="{ width: '26rem' }">
                 <span class="p-text-secondary block mb-5">Enter parameters for decrypting.</span>
@@ -1312,10 +1336,10 @@ const isSwapButtonDisabled = computed(() => {
                 <label for="rc-secret" class="font-semibold w-6rem">Secret key</label>
                 <InputText v-model="rcprivate" id="rc-secret" class="flex-auto" autocomplete="off" />
               </div>
-              <template #footer>
-                <Button type="button" label="Cancel" text severity="secondary" @click="rcdecryption = false; isRcOpenDe = false" ></Button>
+              <div class="flex justify-content-end gap-2">
+                <Button type="button" label="Cancel" text severity="secondary" @click="rcdecryption = false; isRcOpenDe = false; selectedType = groupedTypes[0].items[0];" ></Button>
                 <Button type="button" label="Save" @click="DialogRcGenerateDe(); isRcOpenDe = false" ></Button>
-              </template>
+              </div>
             </Dialog>
             <Dialog :closable="false" v-model:visible="desencryption" modal header="DES Encryption" :style="{ width: '26rem' }">
                 <span class="p-text-secondary block mb-5">Enter parameters for encrypting.</span>
@@ -1327,10 +1351,10 @@ const isSwapButtonDisabled = computed(() => {
                 <label for="des-secret" class="font-semibold w-6rem">Secret key</label>
                 <InputText v-model="desprivate" id="des-secret" class="flex-auto" autocomplete="off" />
               </div>
-              <template #footer>
-                <Button type="button" label="Cancel" text severity="secondary" @click="desencryption = false; isDesOpenEn = false" ></Button>
-                <Button type="button" label="Save" @click="DialogDesGenerateEn(); isDesOpenEn = false, desencryption = false" ></Button>
-              </template>
+              <div class="flex justify-content-end gap-2">
+                <Button type="button" label="Cancel" text severity="secondary" @click="desencryption = false; isDesOpenEn = false; selectedType2 = groupedTypes[1].items[0];" ></Button>
+                <Button type="button" label="Save" @click="DialogDesGenerateEn(generateRandomKey(16)); isDesOpenEn = false" ></Button>
+              </div>
             </Dialog>
             <Dialog :closable="false" v-model:visible="desdecryption" modal header="DES Decryption" :style="{ width: '26rem' }" >
                 <span class="p-text-secondary block mb-5">Enter parameters for decrypting.</span>
@@ -1342,10 +1366,10 @@ const isSwapButtonDisabled = computed(() => {
                 <label for="des-secret" class="font-semibold w-6rem">Secret key</label>
                 <InputText v-model="desprivate" id="des-secret" class="flex-auto" autocomplete="off" />
               </div>
-              <template #footer>
-                <Button type="button" label="Cancel" text severity="secondary" @click="desdecryption = false; isDesOpenDe = false" ></Button>
+              <div class="flex justify-content-end gap-2">
+                <Button type="button" label="Cancel" text severity="secondary" @click="desdecryption = false; isDesOpenDe = false; selectedType = groupedTypes[0].items[0];" ></Button>
                 <Button type="button" label="Save" @click="DialogDesGenerateDe(); isDesOpenDe = false; desdecryption = false;" ></Button>
-              </template>
+              </div>
             </Dialog>
               </div>
             </template>
