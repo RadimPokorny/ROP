@@ -89,7 +89,7 @@ const argonsalt = ref();
 const numberOptions = Array.from({ length: 20 }, (_, index) => (index + 1).toString());
 
 //Dialog for argon2 default
-var visible = ref(false);
+var argon2visible = ref();
 
 //Dialog for AES default
 var aesencryption = ref(false);
@@ -254,7 +254,7 @@ function generateSalt(): String {
 
 //Generate hash with values from the dialog
 async function DialogHashGenerate(this:any): Promise<void>{
-  this.visible = false;
+  argon2visible.value = false;
   const result = await argon2.hash({
     pass: value.value,
     salt: generateSalt(),
@@ -271,24 +271,19 @@ async function DialogHashGenerate(this:any): Promise<void>{
 //Generate AES encrypted string
 async function DialogAesGenerateEn(this: any): Promise<void> {
 
-    const msg = new TextEncoder().encode(aesinput.value);
+  const msg = new TextEncoder().encode(aesinput.value);
   const key = new TextEncoder().encode(secretkey.value);
   const iv = new TextEncoder().encode(aesvector.value);
   const encrypted = await aes.encrypt(msg, key, {name: 'AES-GCM', iv, tagLength: 16});
   const decrypted = await aes.decrypt(encrypted, key, {name: 'AES-GCM', iv, tagLength: 16});
-
   
   value2.value = btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(encrypted))));
 
-
-
-    value.value = aesinput.value;
+  value.value = aesinput.value;
     
-      selectedType2.value = groupedTypes.value[1].items[0];
-    
+  selectedType2.value = groupedTypes.value[1].items[0];
 
-    aesencryption.value = false;
-  
+  aesencryption.value = false;
 }
 
 //Generate RSA encrypted output
@@ -395,7 +390,7 @@ async function DialogDesGenerateEn(this:any): Promise <void>{
   selectedType2.value = groupedTypes.value[1].items[0];
 }
 
-//Decrypt AES string to the plaintext output
+//Decrypt DES string to the plaintext output
 async function DialogDesGenerateDe(this:any): Promise <void>{
   const decryptedData = CryptoJS.DES.decrypt(value.value, desprivate.value).toString(CryptoJS.enc.Utf8);
   value2.value = decryptedData;
@@ -1179,7 +1174,7 @@ const isSwapButtonDisabled = computed(() => {
               <Button
                 icon="pi pi-cog"
                 aria-label="Options"
-                @click="visible = true"
+                @click="argon2visible = true"
                 style="width: 59.2px; height: 59.2px; margin-right: 20px;"
               />
             </div>
@@ -1187,8 +1182,8 @@ const isSwapButtonDisabled = computed(() => {
               <div class="card flex justify-content-center">
                   <Button 
                     label="Show" 
-                    @click="visible = true" />
-                  <Dialog :closable="false" v-model:visible="visible" modal header="Argon2" :style="{ width: '26rem' }">
+                    @click="argon2visible = true" />
+                  <Dialog :closable="false" v-model:visible="argon2visible" modal header="Argon2" :style="{ width: '26rem' }">
                       <span class="p-text-secondary block mb-5">Enter parameters for hashing</span>
                       <div class="flex align-items-center gap-3 mb-5">
                           <label for="salt" class="font-semibold w-6rem">Salt</label>
@@ -1214,7 +1209,7 @@ const isSwapButtonDisabled = computed(() => {
                           <InputText v-model="argonlen" id="hashlength" class="flex-auto" autocomplete="off" />
                       </div>
                       <div class="flex justify-content-end gap-2">
-                          <Button type="button" label="Cancel" @click="visible = false"></Button>
+                          <Button type="button" label="Cancel" @click="argon2visible = false"></Button>
                           <Button type="button" label="Generate hash" @click="DialogHashGenerate()"></Button>
                       </div>
                   </Dialog>
