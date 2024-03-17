@@ -63,7 +63,7 @@ const groupedTypes = ref([
     ]
   },
   {
-    label: 'Crypting',
+    label: 'Encrypting',
     code: 'cr',
     items: [
       { label: 'AES-GCM', value: 'AES-GCM'},
@@ -828,7 +828,7 @@ async function onChange() {
           }
           
           if(convertErrorMessage != ""){
-            alert(convertErrorMessage + "cannot be converted.");
+            alert(convertErrorMessage + "Cannot be converted.");
           }
           
           //Decoding to the character format
@@ -1225,7 +1225,7 @@ const isSwapButtonDisabled = computed(() => {
                           <InputText v-model="argonpar" id="parallelismfactor" class="flex-auto" autocomplete="off" />
                       </div>
                       <div class="flex align-items-center gap-3 mb-5">
-                          <label for="memorycost" class="font-semibold w-6rem">Memory Cost</label>
+                          <label for="memorycost" class="font-semibold w-6rem">Memory Cost (KB)</label>
                           <InputText v-model="argonmem" id="memorycost" class="flex-auto" autocomplete="off" />
                       </div>
                       <div class="flex align-items-center gap-3 mb-5">
