@@ -850,31 +850,19 @@ async function onChange() {
         break;
       }
       case 'AES-GCM':{
-        if(isAesOpenDe.value == false){
           aesdecryption.value = true;
-          isAesOpenDe.value = true;
-        }
         break;
       }
       case 'RSA':{
-        if(isRsaOpenDe.value == false){
           rsadecryption.value = true;
-          isRsaOpenDe.value = true;
-        }
         break;
       }
       case 'RC':{
-        if(isRcOpenDe.value == false){
           rcdecryption.value = true;
-          isRcOpenDe.value = true;
-        }
         break;
       }
       case 'DES':{
-        if(isDesOpenDe.value == false){
           desdecryption.value = true;
-          isDesOpenDe.value = true;
-        }
         break;
       }
       default: {
@@ -1020,32 +1008,20 @@ async function onChange() {
         break;
       }
       case 'AES-GCM':{
-        if(isAesOpenEn.value == false){
           aesencryption.value = true;
-          isAesOpenEn.value = true;
-        }
         break;
       }
       case 'RSA':{
-        if(isRsaOpenEn.value == false){
           rsaencryption.value = true;
-          isRsaOpenEn.value = true;
-        }
         break;
       }
       case 'RC':{
-        if(isRcOpenEn.value == false){
           rcencryption.value = true;
-          isRcOpenEn.value = true;
-        }
         break;
       }
       case 'DES':{
         desprivate.value = generateRandomKey(16);
-        if(isDesOpenEn.value == false){
           desencryption.value = true;
-          isDesOpenEn.value = true;
-        }
         break;
       }
       default: {
