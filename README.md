@@ -27,11 +27,8 @@ The main purpose of this project will be the ability to put a text string in the
    ```npm install argon2-browser```
    ```npm install buffer```
    ```npm install --save js-crypto-aes```
-   ```npm install encrypt-rsa```
-   ```npm install node-rsa```
-   ```npm install rc4.js```
+   ```npm install js-crypto-rsa```
    ```npm install crypto-js```
-   ```npm install crypto-browserify```
 
 3. Open the project (best in Visual Studio Code). Then open the terminal and run this:
 
