@@ -10,7 +10,7 @@ The main purpose of this project will be the ability to put a text string in the
 
    ```npm install vue@latest```
 
-1. Now install these libraries which are used in the project:
+2. Now install these libraries which are used in the project:
 
    ```npm install html-entities```
    ```npm install ts-md5```
