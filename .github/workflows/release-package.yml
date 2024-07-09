@@ -27,10 +27,10 @@ jobs:
         with:
           node-version: 16
           registry-url: 'https://npm.pkg.github.com'
-      - name: Authenticate to GitHub Package Registry
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+      - name: Set up .npmrc
+        run: |
+          echo "@radimpokorny:registry=https://npm.pkg.github.com" >> ~/.npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
       - run: npm ci
       - run: npm publish
         env:
