@@ -2,13 +2,16 @@
   "name": "rop",
   "version": "0.0.0",
   "private": true,
+  "description": "",
+  "main": "index.js",
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check build-only",
     "preview": "vite preview",
     "test:unit": "vitest",
     "build-only": "vite build",
-    "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false"
+    "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "@jridgewell/sourcemap-codec": "^1.4.15",
