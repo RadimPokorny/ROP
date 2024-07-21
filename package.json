@@ -11,7 +11,7 @@
     "test:unit": "vitest",
     "build-only": "vite build",
     "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
-    "test": ""
+    "test": "npm run test:unit"
   },
   "dependencies": {
     "@jridgewell/sourcemap-codec": "^1.4.15",
