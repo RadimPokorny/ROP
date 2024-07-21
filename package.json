@@ -63,7 +63,7 @@
     "primeicons": "^6.0.1",
     "primevue": "^3.26.1",
     "request": "^2.88.2",
-    "rop": "file:ropradimpokorny-1.0.4.tgz",
+    "rop": "file:rop-0.0.0.tgz",
     "smbhash": "^0.0.1",
     "ts-md5": "^1.3.1",
     "uint8-to-base64": "^0.2.0",
