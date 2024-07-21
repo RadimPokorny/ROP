@@ -96,6 +96,6 @@
     "vue-tsc": "^2.0.4"
   },
   "publishConfig": {
-  "@radimpokorny:registry": "https://npm.pkg.github.com"
-}
+    "@radimpokorny:registry": "https://npm.pkg.github.com"
+  }
 }
