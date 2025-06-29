@@ -9,7 +9,9 @@ The main purpose of this project will be the ability to put a text string in the
 
 1. Install or update to the newest version of vue.js:
 
-   `npm install vue@latest`
+   ```bash
+   npm install vue@latest
+   ```
 
 2. Install dependencies that are already listed in the file:
 
@@ -19,10 +21,14 @@ The main purpose of this project will be the ability to put a text string in the
 
 3. Open the project (best in Visual Studio Code). Then open the terminal and run this:
 
-   `npm run dev`
+   ```bash
+   npm run dev
+   ```
 
 4. Click on your localhost link that showed up in the terminal:
 
-   `http://localhost:5173/`
+   ```bash
+   http://localhost:5173/
+   ```
 
 5. Your app is running in the browser.
