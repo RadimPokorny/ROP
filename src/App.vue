@@ -158,7 +158,7 @@ const desprivate = ref();
 desprivate.value = "";
 
 
-const getFilteredGroupedTypesForFirstDropdown = computed(() => {
+const getFilteredGroupedTypesForFirstSelect = computed(() => {
   // Filter the groupedTypes array to include only items with the code 'co'
   return groupedTypes.value.filter(group => group.code === 'co' || group.code === 'pt' || group.code === 'cr');
 });
@@ -1043,71 +1043,50 @@ const isSwapButtonDisabled = computed(() => {
 
 <template>
   <!-- Hidden file input for importFile dialog -->
-  <input 
-    aria-labelledby="Output Text Area" 
-    id="fileInput" 
-    type="file" 
-    style="display: none" 
-    @input="importInput" 
-    accept=".txt, .text"
-  />
-  <header class="header">
-    <p class="title">Web user interface to support penetration testing</p>
-  </header>
+  <input aria-labelledby="Output Text Area" id="fileInput" type="file" style="display: none" @input="importInput"
+    accept=".txt, .text" />
+  <Card class="w-full text-white text-center" style="background-color: var(--p-primary-color)">
+    <template #title>Web user interface to support penetration testing</template>
+    <template #content>
+      <p class="m-0">
+        Developed by Radim Pokorný, supervised by Ing. Willi Lazarov
+      </p>
+    </template>
+  </Card>
   <div class="content">
     <div class="center">
       <div class="column1">
         <div class="center-dropdown">
           <div class="dropdown-copy">
             <div class="dropdown-block">
-              <Dropdown 
-                @change="onChange()"
-                class="dropdown"
-                v-model="selectedType" 
-                :options="getFilteredGroupedTypesForFirstDropdown" 
-                filter 
-                optionLabel="label" 
-                optionGroupLabel="label" 
-                optionGroupChildren="items" 
-                placeholder="Select" 
-                style="width: 250px;">
+              <Select @change="onChange()" class="dropdown" v-model="selectedType"
+                :options="getFilteredGroupedTypesForFirstSelect" filter optionLabel="label" optionGroupLabel="label"
+                optionGroupChildren="items" placeholder="Select" style="width: 250px;">
                 <template #optiongroup="slotProps">
                   <div class="flex align-items-center">
-                      <div>{{ slotProps.option.label }}</div>
+                    <div>{{ slotProps.option.label }}</div>
                   </div>
                 </template>
-              </Dropdown>
+              </Select>
             </div>
             <div class="button-block">
               <div class="button">
-                <Button
-                  :icon="isCopied ? 'pi pi-check' : 'pi pi-copy'"
-                  aria-label="Filter"
-                  @click="copyValue"
-                />
+                <Button style="font-size: 2rem":icon="isCopied ? 'pi pi-check' : 'pi pi-copy'" aria-label="Filter" @click="copyValue"
+                  class="w-[59.2px] h-[59.2px]" />
               </div>
               <div style="margin-left: 20px;" class="button">
-                <Button
-                  icon="pi pi-file-export"
-                  aria-label="Filter"
-                  onclick="document.getElementById('fileInput').click()"
-                />
+                <Button icon="pi pi-file-export" aria-label="Filter"
+                  onclick="document.getElementById('fileInput').click()" class="w-[59.2px] h-[59.2px]" />
               </div>
             </div>
           </div>
         </div>
         <div class="component">
-          <span class="p-float-label">
-            <Textarea 
-              v-model="value" 
-              rows="30" 
-              cols="50" 
-              @input ="areaCheck"
-              class="textarea"
-              aria-labelledby="Input Text Area"
-            />
-            <label>Input</label>
-            </span>
+          <FloatLabel variant="on">
+            <Textarea id="text-input" v-model="value" rows="30" cols="50" @input="areaCheck" class="textarea"
+              aria-labelledby="Input Text Area" />
+            <label for="text-input">Input</label>
+          </FloatLabel>
         </div>
       </div>
       <div class="column2">
@@ -1116,303 +1095,260 @@ const isSwapButtonDisabled = computed(() => {
           <div class="button-block"></div>
         </div>
         <div class="component">
-          <Button 
-          icon="pi pi-arrow-right-arrow-left" 
-          aria-label="Filter" 
-          @click="swapValue()"
-          class="swap-btn"
-          :disabled="isSwapButtonDisabled"
-          />
-          <Button 
-            aria-label="Reset" 
-            icon="pi pi-replay" 
-            @click="resetComps"
-            class="reset-btn"
-          />
-          <Button 
-            aria-label="Trim" 
-            @click="trimInput"
-            class="trim-btn"
-          >
-          <mdicon alt="trim" name="content-cut" />  
-          </Button>
-          
+          <Button icon="pi pi-arrow-right-arrow-left" aria-label="Filter" @click="swapValue()"
+            class="swap-btn w-[59.2px] h-[59.2px]" :disabled="isSwapButtonDisabled" />
+          <Button aria-label="Reset" icon="pi pi-replay" @click="resetComps" class="reset-btn w-[59.2px] h-[59.2px]" />
+          <Button aria-label="Trim" icon="pi pi-star" @click="trimInput" class="trim-btn w-[59.2px] h-[59.2px]" />
+
         </div>
       </div>
       <div class="column3">
         <div class="dropdown-copy">
           <div class="dropdown-block">
-            <Dropdown 
-              class="dropdown"
-              v-model="selectedType2" 
-              :options="groupedTypes" 
-              filter
-              @change="onChange()"
-              optionLabel="label" 
-              optionGroupLabel="label" 
-              optionGroupChildren="items" 
-              placeholder="Select" 
+            <Select class="dropdown" v-model="selectedType2" :options="groupedTypes" filter @change="onChange()"
+              optionLabel="label" optionGroupLabel="label" optionGroupChildren="items" placeholder="Select"
               style="width: 250px;">
               <template #optiongroup="slotProps">
                 <div class="flex align-items-center">
-                    <div>{{ slotProps.option.label }}</div>
+                  <div>{{ slotProps.option.label }}</div>
                 </div>
               </template>
-            </Dropdown>
+            </Select>
           </div>
           <div class="button-block">
-            <div id="btn-drop" class="button" >
-                <InputNumber 
-                  v-tooltip.top="'Enter the number of salts'"
-                  style="display: flex !important;  height: 59.59px; " 
-                  v-model="selectedNumber" 
-                  inputId="minmax-buttons" 
-                  mode="decimal" 
-                  showButtons 
-                    :min="1" 
-                    :max="20" 
-                  @input="onChange()" 
-                  />
+            <div id="btn-drop" class="button">
+              <InputNumber class="flex h-[59.2px] w-[59.2px]" v-tooltip.top="'Enter the number of salts'"
+                v-model="selectedNumber" inputId="stacked-buttons" mode="decimal" showButtons :min="1" :max="20"
+                @input="onChange()" />
             </div>
-            <div id="btn-argon" class="button">
-              <Button
-                icon="pi pi-cog"
-                aria-label="Options"
-                @click="argon2visible = true"
-                style="width: 59.2px; height: 59.2px; margin-right: 20px;"
-              />
+            <div id="btn-argon" class="button" style="margin-right: 20px;">
+              <Button icon="pi pi-cog" aria-label="Options" @click="argon2visible = true"
+                style="width: 59.2px !important; height: 59.2px;" />
             </div>
             <template>
               <div class="card flex justify-content-center">
-                  <Button 
-                    label="Show" 
-                    @click="argon2visible = true" />
-                  <Dialog :closable="false" v-model:visible="argon2visible" modal header="Argon2" :style="{ width: '26rem' }">
-                      <span class="p-text-secondary block mb-5">Enter parameters for hashing</span>
-                      <div class="flex align-items-center gap-3 mb-5">
-                          <label for="salt" class="font-semibold w-6rem">Salt</label>
-                          <span style="display: flex; justify-content: center; align-items: center;" class="p-input-icon-right">
-                            <i class="pi pi-cog"  style="margin-top: -11px" @click="generateSalt()"/>
-                            <InputText v-model="argonsalt" id="salt" class="flex-auto" autocomplete="off" />
-                          </span>
-                      </div>
-                      <div class="flex align-items-center gap-3 mb-5">
-                          <label for="parallelismfactor" class="font-semibold w-6rem">Parallelism Factor</label>
-                          <InputText v-model="argonpar" id="parallelismfactor" class="flex-auto" autocomplete="off" />
-                      </div>
-                      <div class="flex align-items-center gap-3 mb-5">
-                          <label for="memorycost" class="font-semibold w-6rem">Memory Cost (KB)</label>
-                          <InputText v-model="argonmem" id="memorycost" class="flex-auto" autocomplete="off" />
-                      </div>
-                      <div class="flex align-items-center gap-3 mb-5">
-                          <label for="iterations" class="font-semibold w-6rem">Iterations</label>
-                          <InputText v-model="argonite" id="iterations" class="flex-auto" autocomplete="off" />
-                      </div>
-                      <div class="flex align-items-center gap-3 mb-5">
-                          <label for="hashlength" class="font-semibold w-6rem">Hash Length</label>
-                          <InputText v-model="argonlen" id="hashlength" class="flex-auto" autocomplete="off" />
-                      </div>
-                      <div class="flex justify-content-end gap-2">
-                          <Button type="button" label="Cancel" @click="argon2visible = false"></Button>
-                          <Button type="button" label="Generate hash" @click="DialogHashGenerate()"></Button>
-                      </div>
-                  </Dialog>
-                  <Dialog :closable="false" v-model:visible="aesencryption" modal header="AES-GCM Encryption" :style="{ width: '26rem' }">
-                      <span class="p-text-secondary block mb-5">Enter parameters for encrypting.</span>
-                      <div class="flex align-items-center gap-3 mb-3">
-                          <label for="aesinput" class="font-semibold w-6rem">Input</label>
-                          <InputText id="aesinput" v-model="aesinput" class="flex-auto" autocomplete="off"/>
-                      </div>
-                      <div id="aes-vector" class="flex align-items-center gap-3 mb-3">
-                        <label for="aes-vector" class="font-semibold w-6rem">Vector</label>
-                        <InputText v-model="aesvector" id="aes-vector" class="flex-auto" autocomplete="off" />
-                      </div>
-                    <div class="flex align-items-center gap-3 mb-3">
-                      <label for="aes-secret" class="font-semibold w-6rem">Secret key</label>
-                      <InputText v-model="secretkey" id="aes-secret" class="flex-auto" autocomplete="off" />
-                    </div>
-                    <div class="flex justify-content-end gap-2">
-                      <Button type="button" label="Cancel" text severity="secondary" @click="aesencryption = false; isAesOpenEn = false; selectedType2 = groupedTypes[1].items[0];" ></Button>
-                      <Button type="button" label="Save" @click="DialogAesGenerateEn(); isAesOpenEn = false" ></Button>
-                    </div>
-                  </Dialog>
-                  <Dialog :closable="false" v-model:visible="aesdecryption" modal header="AES-GCM Decryption" :style="{ width: '26rem' }">
-                      <span class="p-text-secondary block mb-5">Enter parameters for decrypting.</span>
-                      <div class="flex align-items-center gap-3 mb-3">
-                          <label for="aesinput" class="font-semibold w-6rem">Input</label>
-                          <InputText id="aesinput" v-model="aesinput" class="flex-auto" autocomplete="off"/>
-                      </div>
-                      <div id="aes-vector" class="flex align-items-center gap-3 mb-3">
-                        <label for="aes-vector" class="font-semibold w-6rem">Vector</label>
-                        <InputText v-model="aesvector" id="aes-vector" class="flex-auto" autocomplete="off" />
+                <Button label="Show" @click="argon2visible = true" />
+                <Dialog :closable="false" v-model:visible="argon2visible" modal header="Argon2"
+                  :style="{ width: '26rem' }">
+                  <span class="p-text-secondary block mb-5">Enter parameters for hashing</span>
+                  <div class="flex align-items-center gap-3 mb-5">
+                    <label for="salt" class="font-semibold w-6rem">Salt</label>
+                    <span style="display: flex; justify-content: center; align-items: center;"
+                      class="p-input-icon-right">
+                      <i class="pi pi-cog mr-2" @click="generateSalt()" />
+                      <InputText v-model="argonsalt" id="salt" class="flex-auto" autocomplete="off" />
+                    </span>
+                  </div>
+                  <div class="flex align-items-center gap-3 mb-5">
+                    <label for="parallelismfactor" class="font-semibold w-6rem">Parallelism Factor</label>
+                    <InputText v-model="argonpar" id="parallelismfactor" class="flex-auto" autocomplete="off" />
+                  </div>
+                  <div class="flex align-items-center gap-3 mb-5">
+                    <label for="memorycost" class="font-semibold w-6rem">Memory Cost (KB)</label>
+                    <InputText v-model="argonmem" id="memorycost" class="flex-auto" autocomplete="off" />
+                  </div>
+                  <div class="flex align-items-center gap-3 mb-5">
+                    <label for="iterations" class="font-semibold w-6rem">Iterations</label>
+                    <InputText v-model="argonite" id="iterations" class="flex-auto" autocomplete="off" />
+                  </div>
+                  <div class="flex align-items-center gap-3 mb-5">
+                    <label for="hashlength" class="font-semibold w-6rem">Hash Length</label>
+                    <InputText v-model="argonlen" id="hashlength" class="flex-auto" autocomplete="off" />
+                  </div>
+                  <div class="flex justify-content-end gap-2">
+                    <Button type="button" label="Cancel" @click="argon2visible = false"></Button>
+                    <Button type="button" label="Generate hash" @click="DialogHashGenerate()"></Button>
+                  </div>
+                </Dialog>
+                <Dialog :closable="false" v-model:visible="aesencryption" modal header="AES-GCM Encryption"
+                  :style="{ width: '26rem' }">
+                  <span class="p-text-secondary block mb-5">Enter parameters for encrypting.</span>
+                  <div class="flex align-items-center gap-3 mb-3">
+                    <label for="aesinput" class="font-semibold w-6rem">Input</label>
+                    <InputText id="aesinput" v-model="aesinput" class="flex-auto" autocomplete="off" />
+                  </div>
+                  <div id="aes-vector" class="flex align-items-center gap-3 mb-3">
+                    <label for="aes-vector" class="font-semibold w-6rem">Vector</label>
+                    <InputText v-model="aesvector" id="aes-vector" class="flex-auto" autocomplete="off" />
+                  </div>
+                  <div class="flex align-items-center gap-3 mb-3">
+                    <label for="aes-secret" class="font-semibold w-6rem">Secret key</label>
+                    <InputText v-model="secretkey" id="aes-secret" class="flex-auto" autocomplete="off" />
+                  </div>
+                  <div class="flex justify-content-end gap-2">
+                    <Button type="button" label="Cancel" text severity="secondary"
+                      @click="aesencryption = false; isAesOpenEn = false; selectedType2 = groupedTypes[1].items[0];"></Button>
+                    <Button type="button" label="Save" @click="DialogAesGenerateEn(); isAesOpenEn = false"></Button>
+                  </div>
+                </Dialog>
+                <Dialog :closable="false" v-model:visible="aesdecryption" modal header="AES-GCM Decryption"
+                  :style="{ width: '26rem' }">
+                  <span class="p-text-secondary block mb-5">Enter parameters for decrypting.</span>
+                  <div class="flex align-items-center gap-3 mb-3">
+                    <label for="aesinput" class="font-semibold w-6rem">Input</label>
+                    <InputText id="aesinput" v-model="aesinput" class="flex-auto" autocomplete="off" />
+                  </div>
+                  <div id="aes-vector" class="flex align-items-center gap-3 mb-3">
+                    <label for="aes-vector" class="font-semibold w-6rem">Vector</label>
+                    <InputText v-model="aesvector" id="aes-vector" class="flex-auto" autocomplete="off" />
 
-                    </div>
+                  </div>
 
-                    <div class="flex align-items-center gap-3 mb-3">
-                      <label for="aes-secret" class="font-semibold w-6rem">Secret key</label>
-                      <InputText v-model="secretkey" id="aes-secret" class="flex-auto" autocomplete="off" />
-                    </div>
-                    <div class="flex justify-content-end gap-2">
-                      <Button type="button" label="Cancel" text severity="secondary" @click="aesdecryption = false; isAesOpenDe = false; selectedType = groupedTypes[0].items[0];" ></Button>
-                      <Button type="button" label="Save" @click="DialogAesGenerateDe(); isAesOpenDe = false" ></Button>
-                    </div>
-                  </Dialog>
-                  <Dialog :closable="false" v-model:visible="rsaencryption" modal header="RSA Encryption" :style="{ width: '26rem' }">
-                    <span class="p-text-secondary block mb-5">Enter parameters for encrypting. Press button save for new keys and output. Please do not paste keys in one line. The key will then have the wrong format </span>
-                    <div id="aes-vector" class="flex align-items-center gap-3 mb-2">
-                      <label for="rsa-public" class="font-semibold w-6rem">Public key</label>
-                      <InputText v-model="rsapublic" id="rsa-public" class="flex-auto" autocomplete="off" />
-                    </div>
+                  <div class="flex align-items-center gap-3 mb-3">
+                    <label for="aes-secret" class="font-semibold w-6rem">Secret key</label>
+                    <InputText v-model="secretkey" id="aes-secret" class="flex-auto" autocomplete="off" />
+                  </div>
+                  <div class="flex justify-content-end gap-2">
+                    <Button type="button" label="Cancel" text severity="secondary"
+                      @click="aesdecryption = false; isAesOpenDe = false; selectedType = groupedTypes[0].items[0];"></Button>
+                    <Button type="button" label="Save" @click="DialogAesGenerateDe(); isAesOpenDe = false"></Button>
+                  </div>
+                </Dialog>
+                <Dialog :closable="false" v-model:visible="rsaencryption" modal header="RSA Encryption"
+                  :style="{ width: '26rem' }">
+                  <span class="p-text-secondary block mb-5">Enter parameters for encrypting. Press button save for new
+                    keys and output. Please do not paste keys in one line. The key will then have the wrong format
+                  </span>
+                  <div id="aes-vector" class="flex align-items-center gap-3 mb-2">
+                    <label for="rsa-public" class="font-semibold w-6rem">Public key</label>
+                    <InputText v-model="rsapublic" id="rsa-public" class="flex-auto" autocomplete="off" />
+                  </div>
                   <div class="flex align-items-center gap-3 mb-2">
                     <label for="rsa-private" class="font-semibold w-6rem">Private key</label>
                     <Textarea v-model="rsaprivate" id="rsa-private" class="flex-auto" autocomplete="off" />
                   </div>
                   <div class="flex justify-content-end gap-2">
-                    <Button type="button" label="Cancel" text severity="secondary" @click="rsaencryption = false; isAesOpenDe = false; selectedType2 = groupedTypes[1].items[0];" ></Button>
-                    <Button type="button" label="Save" @click="DialogRsaGenerateEn(); isRsaOpenEn = false;" ></Button>
+                    <Button type="button" label="Cancel" text severity="secondary"
+                      @click="rsaencryption = false; isAesOpenDe = false; selectedType2 = groupedTypes[1].items[0];"></Button>
+                    <Button type="button" label="Save" @click="DialogRsaGenerateEn(); isRsaOpenEn = false;"></Button>
                   </div>
                 </Dialog>
-                <Dialog :closable="false" v-model:visible="rsadecryption" modal header="RSA Decryption" :style="{ width: '26rem' }">
+                <Dialog :closable="false" v-model:visible="rsadecryption" modal header="RSA Decryption"
+                  :style="{ width: '26rem' }">
                   <span class="p-text-secondary block mb-5">Enter parameters for decrypting.</span>
                   <div class="flex align-items-center gap-3 mb-3">
-                      <label for="rsainput" class="font-semibold w-6rem">Input</label>
-                      <InputText id="rsainput" v-model="rsainput" class="flex-auto" autocomplete="off"/>
+                    <label for="rsainput" class="font-semibold w-6rem">Input</label>
+                    <InputText id="rsainput" v-model="rsainput" class="flex-auto" autocomplete="off" />
                   </div>
-                <div class="flex align-items-center gap-3 mb-2">
-                  <label for="rsa-private" class="font-semibold w-6rem">Private key</label>
-                  <Textarea v-model="rsaprivate" id="rsa-private" class="flex-auto" autocomplete="off" />
-                </div>
-                <div class="flex justify-content-end gap-2">
-                  <Button type="button" label="Cancel" text severity="secondary" @click="rsadecryption = false; isAesOpenDe = false; selectedType = groupedTypes[0].items[0];" ></Button>
-                  <Button type="button" label="Save" @click="DialogRsaGenerateDe(); isRsaOpenDe = false" ></Button>
-                </div>
-              </Dialog>
-              <Dialog :closable="false" v-model:visible="rcencryption" modal header="RC Encryption" :style="{ width: '26rem' }">
-                <span class="p-text-secondary block mb-5">Enter parameters for encrypting. Press button save for new key and output</span>
-                <div class="flex align-items-center gap-3 mb-3">
+                  <div class="flex align-items-center gap-3 mb-2">
+                    <label for="rsa-private" class="font-semibold w-6rem">Private key</label>
+                    <Textarea v-model="rsaprivate" id="rsa-private" class="flex-auto" autocomplete="off" />
+                  </div>
+                  <div class="flex justify-content-end gap-2">
+                    <Button type="button" label="Cancel" text severity="secondary"
+                      @click="rsadecryption = false; isAesOpenDe = false; selectedType = groupedTypes[0].items[0];"></Button>
+                    <Button type="button" label="Save" @click="DialogRsaGenerateDe(); isRsaOpenDe = false"></Button>
+                  </div>
+                </Dialog>
+                <Dialog :closable="false" v-model:visible="rcencryption" modal header="RC Encryption"
+                  :style="{ width: '26rem' }">
+                  <span class="p-text-secondary block mb-5">Enter parameters for encrypting. Press button save for new
+                    key and output</span>
+                  <div class="flex align-items-center gap-3 mb-3">
                     <label for="rcinput" class="font-semibold w-6rem">Input</label>
-                    <InputText id="rcinput" v-model="value" class="flex-auto" autocomplete="off"/>
-                </div>
-              <div class="flex align-items-center gap-3 mb-2">
-                <label for="rc-secret" class="font-semibold w-6rem">Secret key</label>
-                <InputText v-model="rcprivate" id="rc-secret" class="flex-auto" autocomplete="off" />
-              </div>
-              <div class="flex justify-content-end gap-2">
-                <Button type="button" label="Cancel" text severity="secondary" @click="rcencryption = false; isRcOpenEn = false; selectedType2 = groupedTypes[1].items[0];" ></Button>
-                <Button type="button" label="Save" @click="DialogRcGenerateEn(generateRandomKey(16)); isRcOpenEn = false" ></Button>
-              </div>
-            </Dialog>
-            <Dialog :closable="false" v-model:visible="rcdecryption" modal header="RC Decryption" :style="{ width: '26rem' }">
-                <span class="p-text-secondary block mb-5">Enter parameters for decrypting.</span>
-                <div class="flex align-items-center gap-3 mb-3">
+                    <InputText id="rcinput" v-model="value" class="flex-auto" autocomplete="off" />
+                  </div>
+                  <div class="flex align-items-center gap-3 mb-2">
+                    <label for="rc-secret" class="font-semibold w-6rem">Secret key</label>
+                    <InputText v-model="rcprivate" id="rc-secret" class="flex-auto" autocomplete="off" />
+                  </div>
+                  <div class="flex justify-content-end gap-2">
+                    <Button type="button" label="Cancel" text severity="secondary"
+                      @click="rcencryption = false; isRcOpenEn = false; selectedType2 = groupedTypes[1].items[0];"></Button>
+                    <Button type="button" label="Save"
+                      @click="DialogRcGenerateEn(generateRandomKey(16)); isRcOpenEn = false"></Button>
+                  </div>
+                </Dialog>
+                <Dialog :closable="false" v-model:visible="rcdecryption" modal header="RC Decryption"
+                  :style="{ width: '26rem' }">
+                  <span class="p-text-secondary block mb-5">Enter parameters for decrypting.</span>
+                  <div class="flex align-items-center gap-3 mb-3">
                     <label for="rcinput" class="font-semibold w-6rem">Input</label>
-                    <InputText id="rcinput" v-model="value" class="flex-auto" autocomplete="off"/>
-                </div>
-              <div class="flex align-items-center gap-3 mb-2">
-                <label for="rc-secret" class="font-semibold w-6rem">Secret key</label>
-                <InputText v-model="rcprivate" id="rc-secret" class="flex-auto" autocomplete="off" />
-              </div>
-              <div class="flex justify-content-end gap-2">
-                <Button type="button" label="Cancel" text severity="secondary" @click="rcdecryption = false; isRcOpenDe = false; selectedType = groupedTypes[0].items[0];" ></Button>
-                <Button type="button" label="Save" @click="DialogRcGenerateDe(); isRcOpenDe = false" ></Button>
-              </div>
-            </Dialog>
-            <Dialog :closable="false" v-model:visible="desencryption" modal header="DES Encryption" :style="{ width: '26rem' }">
-                <span class="p-text-secondary block mb-5">Enter parameters for encrypting.</span>
-                <div class="flex align-items-center gap-3 mb-3">
+                    <InputText id="rcinput" v-model="value" class="flex-auto" autocomplete="off" />
+                  </div>
+                  <div class="flex align-items-center gap-3 mb-2">
+                    <label for="rc-secret" class="font-semibold w-6rem">Secret key</label>
+                    <InputText v-model="rcprivate" id="rc-secret" class="flex-auto" autocomplete="off" />
+                  </div>
+                  <div class="flex justify-content-end gap-2">
+                    <Button type="button" label="Cancel" text severity="secondary"
+                      @click="rcdecryption = false; isRcOpenDe = false; selectedType = groupedTypes[0].items[0];"></Button>
+                    <Button type="button" label="Save" @click="DialogRcGenerateDe(); isRcOpenDe = false"></Button>
+                  </div>
+                </Dialog>
+                <Dialog :closable="false" v-model:visible="desencryption" modal header="DES Encryption"
+                  :style="{ width: '26rem' }">
+                  <span class="p-text-secondary block mb-5">Enter parameters for encrypting.</span>
+                  <div class="flex align-items-center gap-3 mb-3">
                     <label for="desinput" class="font-semibold w-6rem">Input</label>
-                    <InputText id="desinput" v-model="value" class="flex-auto" autocomplete="off"/>
-                </div>
-              <div class="flex align-items-center gap-3 mb-2">
-                <label for="des-secret" class="font-semibold w-6rem">Secret key</label>
-                <InputText v-model="desprivate" id="des-secret" class="flex-auto" autocomplete="off" />
-              </div>
-              <div class="flex justify-content-end gap-2">
-                <Button type="button" label="Cancel" text severity="secondary" @click="desencryption = false; isDesOpenEn = false; selectedType2 = groupedTypes[1].items[0];" ></Button>
-                <Button type="button" label="Save" @click="DialogDesGenerateEn(generateRandomKey(16)); isDesOpenEn = false" ></Button>
-              </div>
-            </Dialog>
-            <Dialog :closable="false" v-model:visible="desdecryption" modal header="DES Decryption" :style="{ width: '26rem' }" >
-                <span class="p-text-secondary block mb-5">Enter parameters for decrypting.</span>
-                <div class="flex align-items-center gap-3 mb-3">
+                    <InputText id="desinput" v-model="value" class="flex-auto" autocomplete="off" />
+                  </div>
+                  <div class="flex align-items-center gap-3 mb-2">
+                    <label for="des-secret" class="font-semibold w-6rem">Secret key</label>
+                    <InputText v-model="desprivate" id="des-secret" class="flex-auto" autocomplete="off" />
+                  </div>
+                  <div class="flex justify-content-end gap-2">
+                    <Button type="button" label="Cancel" text severity="secondary"
+                      @click="desencryption = false; isDesOpenEn = false; selectedType2 = groupedTypes[1].items[0];"></Button>
+                    <Button type="button" label="Save"
+                      @click="DialogDesGenerateEn(generateRandomKey(16)); isDesOpenEn = false"></Button>
+                  </div>
+                </Dialog>
+                <Dialog :closable="false" v-model:visible="desdecryption" modal header="DES Decryption"
+                  :style="{ width: '26rem' }">
+                  <span class="p-text-secondary block mb-5">Enter parameters for decrypting.</span>
+                  <div class="flex align-items-center gap-3 mb-3">
                     <label for="desinput" class="font-semibold w-6rem">Input</label>
-                    <InputText id="desinput" v-model="value" class="flex-auto" autocomplete="off"/>
-                </div>
-              <div class="flex align-items-center gap-3 mb-2">
-                <label for="des-secret" class="font-semibold w-6rem">Secret key</label>
-                <InputText v-model="desprivate" id="des-secret" class="flex-auto" autocomplete="off" />
-              </div>
-              <div class="flex justify-content-end gap-2">
-                <Button type="button" label="Cancel" text severity="secondary" @click="desdecryption = false; isDesOpenDe = false; selectedType = groupedTypes[0].items[0];" ></Button>
-                <Button type="button" label="Save" @click="DialogDesGenerateDe(); isDesOpenDe = false; desdecryption = false;" ></Button>
-              </div>
-            </Dialog>
+                    <InputText id="desinput" v-model="value" class="flex-auto" autocomplete="off" />
+                  </div>
+                  <div class="flex align-items-center gap-3 mb-2">
+                    <label for="des-secret" class="font-semibold w-6rem">Secret key</label>
+                    <InputText v-model="desprivate" id="des-secret" class="flex-auto" autocomplete="off" />
+                  </div>
+                  <div class="flex justify-content-end gap-2">
+                    <Button type="button" label="Cancel" text severity="secondary"
+                      @click="desdecryption = false; isDesOpenDe = false; selectedType = groupedTypes[0].items[0];"></Button>
+                    <Button type="button" label="Save"
+                      @click="DialogDesGenerateDe(); isDesOpenDe = false; desdecryption = false;"></Button>
+                  </div>
+                </Dialog>
               </div>
             </template>
             <div class="button">
-              <Button
-                :icon="isCopied2 ? 'pi pi-check' : 'pi pi-copy'"
-                aria-label="Filter"
-                @click="copyValue2"
-              />
+              <Button :icon="isCopied2 ? 'pi pi-check' : 'pi pi-copy'" aria-label="Filter" @click="copyValue2"
+                class="w-[59.2px] h-[59.2px]" />
             </div>
             <div style="margin-left: 20px;" class="button">
-              <Button
-                icon="pi pi-file-import"
-                aria-label="Export"
-                @click="exportOutput"
-              />
+              <Button icon="pi pi-file-import" aria-label="Export" @click="exportOutput"
+                class="w-[59.2px] h-[59.2px]" />
             </div>
           </div>
         </div>
         <div class="component">
-          <span class="p-float-label">
-            <Textarea 
-              v-model="value2" 
-              rows="30" 
-              cols="50" 
-              class="textarea"
-              aria-labelledby="Output Text Area"
-              disabled
-            />
-          <label>Output</label>
-          </span>
+          <FloatLabel variant="on">
+            <Textarea id="text-output" v-model="value2" rows="30" cols="50" class="textarea"
+              aria-labelledby="Output Text Area" disabled />
+            <label for="text-output">Output</label>
+          </FloatLabel>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<style scoped lang="scss">  
-$color_1: white; 
-$background-color_1: #f16736;
+<style lang="scss">
 
-.header {
-	position: absolute;
-	background-color:$background-color_1;
-  color:$color_1;
-	padding: 20px; 
-	text-align: center;
-	width: 100%;
-	height: 60px;
-	top: 0;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-
-.title {
-	font-size: 24px;
-	color: $color_1;
+*:focus {
+  outline: none;
 }
 
 .button {
 	margin-top: 20px;
   margin-bottom: 20px;
+  max-width: 59.2px !important
 }
 
 .content {
-	position: absolute !important;
 	display: flex;
 	align-items: center;
 	flex-direction: column;
@@ -1424,8 +1360,6 @@ $background-color_1: #f16736;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	background-color: $background-color_1;
-	color: $color_1;
 	width: 300px;
 	height: 80px;
 	border-radius: 20px;
@@ -1441,9 +1375,26 @@ $background-color_1: #f16736;
   opacity: 1;
 }
 
+.pi {
+  font-size: 1.5rem !important;
+}
+
 .p-inputnumber-input{
   position: relative;
-  height: 80px !important;
+  width: 59.2px !important;
+}
+
+.p-inputnumber-button{
+  width: 20px !important;
+}
+
+.p-inputnumber-stacked,
+.p-inputnumber-clear-icon .p-inputnumber-horizontal .p-inputnumber-clear-icon {
+  inset-inline-end: 0 !important;
+}
+
+.p-card .p-card-content {
+  padding: 0 0 !important;
 }
 
 
@@ -1525,8 +1476,11 @@ Textarea {
   align-items: center;
 }
 
+.p-button{
+  color: white !important;
+}
+
 .p-button.p-button-icon-only {
-  color: $color_1;
   height: 3.7rem;
   width: 3.7rem;
   padding: .714rem;
@@ -1536,6 +1490,10 @@ Textarea {
 .dropdown{
   margin: 20px;
   margin-left: 0px;
+  height: 59.2px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .p-float-label input:focus ~ label, .p-float-label input.p-filled ~ label, .p-float-label textarea:focus ~ label, .p-float-label textarea.p-filled ~ label, .p-float-label .p-inputwrapper-focus ~ label, .p-float-label .p-inputwrapper-filled ~ label
@@ -1543,6 +1501,15 @@ Textarea {
   font-size: 16px;
 }
 
+.p-floatlabel-on:has(input:focus) label,
+.p-floatlabel-on:has(input.p-filled) label,
+.p-floatlabel-on:has(input:-webkit-autofill) label,
+.p-floatlabel-on:has(textarea:focus) label,
+.p-floatlabel-on:has(textarea.p-filled) label,
+.p-floatlabel-on:has(.p-inputwrapper-focus) label,
+.p-floatlabel-on:has(.p-inputwrapper-filled) label {
+  background: none !important;
+}
 @media only screen and (min-width: 950px) and (max-width: 1200px) {
   /* Vaše stylizace pro šířku od 900px do 1100px */
   .dropdown{
@@ -1553,6 +1520,13 @@ Textarea {
 }
 
 @media only screen and (max-width: 950px) {
+  .p-card{
+    margin-top: 2rem;
+  }
+  #app{
+    margin: 0 auto;
+  }
+
   .dropdown-copy{
     flex-direction: column;
     height: 178.78px !important;
@@ -1603,7 +1577,6 @@ Textarea {
     flex-direction: row;
     width: 100%;
     margin-top: 15px;   
-    background-color: #1E1E1E;
     .component{
       display: flex;
       justify-content: center;
@@ -1639,15 +1612,6 @@ Textarea {
       flex-direction: column;
       height: 99.2px !important;
     }
-  }
-}
-
-@media only screen and (max-width: 798px) {
-  .header{
-    height: 120px;
-  }
-  .content{
-    margin-top: 125px;
   }
 }
 </style>
