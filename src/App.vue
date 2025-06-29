@@ -317,9 +317,7 @@ async function DialogRsaGenerateEn(this: any): Promise <void> {
     rsapublic.value = jwk2pem(publicKey);
     const privateKey = key.privateKey;
     rsaprivate.value = jwk2pem(privateKey);
-    // Zjistění typu proměnné
 
-// Nyní můžete vypsat typ do konzole
     const msg = new TextEncoder().encode(value.value);
 
     rsa.encrypt(
@@ -1511,12 +1509,9 @@ Textarea {
   background: none !important;
 }
 @media only screen and (min-width: 950px) and (max-width: 1200px) {
-  /* Vaše stylizace pro šířku od 900px do 1100px */
   .dropdown{
     width: 150px !important;
   }
-
-  /* Další stylizace ... */
 }
 
 @media only screen and (max-width: 950px) {
