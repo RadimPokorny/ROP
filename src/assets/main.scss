@@ -10,9 +10,9 @@ $background-color_2: #f07f56;
 	margin: 0 auto;
 	font-weight: normal;
 	display: flex;
-	justify-content: center;
 	align-items: center;
 	flex-direction: column;
+	min-height: 100vh !important;
 }
 
 .center {
@@ -32,7 +32,6 @@ body {
 @media (min-width: 1024px) {
 	#app {
 		display: flex;
-		justify-content: center;
 		align-items: center;
 		grid-template-columns: 1fr 1fr;
 		padding: 0 2rem;

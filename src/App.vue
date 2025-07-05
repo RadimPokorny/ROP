@@ -1043,7 +1043,7 @@ const isSwapButtonDisabled = computed(() => {
   <!-- Hidden file input for importFile dialog -->
   <input aria-labelledby="Output Text Area" id="fileInput" type="file" style="display: none" @input="importInput"
     accept=".txt, .text" />
-  <Card class="w-full text-white text-center" style="background-color: var(--p-primary-color)">
+  <Card class="w-full text-white text-center mt-[20px]" style="background-color: var(--p-primary-color)">
     <template #title>Web user interface to support penetration testing</template>
     <template #content>
       <p class="m-0">
@@ -1336,6 +1336,45 @@ const isSwapButtonDisabled = computed(() => {
 
 <style lang="scss">
 
+$background-color_1: #f16736;
+// Custom colors
+$primary-orange: #ff7c4b;
+$primary-grey: #212121;
+$primary-grey-dark: #1c1c1c;
+$panel-container: rgba(0, 0, 0, .3);
+$panel-dialog: rgba(0, 0, 0, .4);
+$grey-border: rgba(255, 255, 255, .12);
+$grey-row-unread: rgba(255, 255, 255, .15);
+$grey-splitter: rgba(255, 255, 255, .3);
+$grey-paginator: rgba(255, 255, 255, .6);
+$grey-select: rgba(255, 255, 255, .87);
+$ghost: #c8ebfb;
+$editor-toolbar: #a2a2a2;
+
+.p-select{
+  background: $primary-grey-dark !important;
+}
+
+.p-textarea:disabled{
+  background: $primary-grey-dark !important;
+}
+
+.p-textarea{
+  background:$primary-grey !important;
+}
+
+.p-select-overlay{
+  background: $primary-grey-dark !important;
+}
+
+.p-dialog{
+  background: $primary-grey-dark !important;
+}
+
+.p-dialog-header, .p-dialog-content{
+  background: transparent !important ;
+}
+
 *:focus {
   outline: none;
 }
@@ -1441,7 +1480,6 @@ const isSwapButtonDisabled = computed(() => {
 
 .column1, .column3  {
   @extend .column;
-  width: 40%;
 }
 
 .column2  {
@@ -1545,11 +1583,6 @@ Textarea {
     margin-right: 20px;
   }
 
-  .column1, .column3  {
-    @extend .column;
-    width: auto !important;
-  }
-
   .dropdown{
     margin-left: 20px;
   }
@@ -1580,9 +1613,9 @@ Textarea {
   }
 
   .column1, .column3{
-    width: 90%;
-    margin-left: 20px;
-    margin-right: 20px;
+    width: 100%;
+    margin-left: 0px;
+    margin-right: 0px;
   }
 
   .reset-btn{
