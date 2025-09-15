@@ -41,7 +41,7 @@ $editor-toolbar: #a2a2a2;
 body {
 	min-height: 100vh;
 	color: $color_1;
-	background: $panel-container;
+	background: $primary-grey-dark !important;
 	transition: color 0.5s, background-color 0.5s;
 	line-height: 1.6;
 	font-family: $font-family_1;
